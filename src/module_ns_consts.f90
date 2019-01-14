@@ -16,7 +16,6 @@ module ns_const
 	real*8, save :: ddtmax,ddtmin           !!maximum timestep, minimum timestep to output
 	real*8, save :: cflmax,cflmin           !!maximum timestep, minimum timestep
 	real*8, save :: dcflmax,dcflmin         !!maximum timestep, minimum timestep to output
-	integer,save :: subiteration            !!subiteration number(needed in unsteady dual time-stepping method)
 	integer,save :: timestep                !!current timestep number
 	real*8, save :: flow_time               !!current real flow time
 	integer,save :: ntstep                  !!total timestep

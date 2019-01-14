@@ -12,7 +12,6 @@ module flag_var
 	integer,save :: iflag_des
 	integer,save :: iflag_init
 	integer,save :: iflag_blockinterface
-	integer,save :: iflag_walldisttype
 	!!
 	integer,save :: iflag_acoustic
 	integer,save :: restart_timestep
@@ -81,10 +80,6 @@ module flag_var
 	!!******************************************************************************************************
 	integer,parameter :: iflag_des97          =  1 !!(iflag_des)detached-eddy simulation 1997
 	integer,parameter :: iflag_ddes           =  2 !!(iflag_des)delayed detached-eddy simulation
-	!!******************************************************************************************************
-	integer,parameter :: iflag_intp           =  1 !!(iflag_blockinterface)average procedure
-	integer,parameter :: iflag_gcic           =  2 !!(iflag_blockinterface)generalize characteristic interface conditions
-	integer,parameter :: iflag_overlap        =  3 !!(iflag_blockinterface)overlap method
 	!!******************************************************************************************************	
 	!!boundary condition
 	integer,parameter :: bc_user     = -90

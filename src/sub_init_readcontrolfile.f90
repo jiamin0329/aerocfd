@@ -29,13 +29,13 @@ subroutine init_readcontrolfile
 		
 		read(99,*) buff
 		read(99,*) buff
-		read(99,*) iflag_dimension,iflag_solver,iflag_time,cfl,dt,subiteration                                  !!6
+		read(99,*) iflag_dimension,iflag_solver,iflag_time,cfl,dt                                               !!6
 		read(99,*) buff
 		read(99,*) buff
-		read(99,*) ma,re,tinf,aoa,iflag_walldisttype                                                            !!5
+		read(99,*) ma,re,tinf,aoa                                                                               !!5
 		read(99,*) buff
 		read(99,*) buff
-		read(99,*) scale_x,scale_y,scale_z,lref,sref,fltr,iflag_blockinterface                                  !!7
+		read(99,*) scale_x,scale_y,scale_z,lref,sref,fltr                                                       !!7
 		read(99,*) buff
 		read(99,*) buff
 		read(99,*) iflag_splittingtype,iflag_inviscid,iflag_filter,iflag_timeadvance,iflag_turbulence,iflag_des !!6
@@ -72,13 +72,11 @@ subroutine init_readcontrolfile
 	call MPI_BCAST(iflag_time,          1,MPI_INTEGER,         0,MPI_COMM_WORLD,ierr)
 	call MPI_BCAST(cfl,                 1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
 	call MPI_BCAST(dt,                  1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
-	call MPI_BCAST(subiteration,        1,MPI_INTEGER,         0,MPI_COMM_WORLD,ierr)
 	!!line 2
 	call MPI_BCAST(ma,                  1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
 	call MPI_BCAST(re,                  1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
 	call MPI_BCAST(tinf,                1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
 	call MPI_BCAST(aoa,                 1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
-	call MPI_BCAST(iflag_walldisttype,  1,MPI_INTEGER,         0,MPI_COMM_WORLD,ierr)
 	!!line 3
 	call MPI_BCAST(scale_x,             1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
 	call MPI_BCAST(scale_y,             1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
@@ -86,7 +84,6 @@ subroutine init_readcontrolfile
 	call MPI_BCAST(lref,                1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
 	call MPI_BCAST(sref,                1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
 	call MPI_BCAST(fltr,                1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
-	call MPI_BCAST(iflag_blockinterface,1,MPI_INTEGER,         0,MPI_COMM_WORLD,ierr)
 
 	!!line 4
 	call MPI_BCAST(iflag_splittingtype, 1,MPI_INTEGER,         0,MPI_COMM_WORLD,ierr)
