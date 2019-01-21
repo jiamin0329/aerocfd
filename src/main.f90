@@ -25,7 +25,7 @@ program sjtucfd_mpi
 	integer :: is, ie, js, je, ks, ke  !!block dimension
 
 	character(len = 180) :: debugFile
-	bufferLength = 1
+	!!bufferLength = 1
 	isDebug = 0
 
 	!!get mpi info
@@ -79,6 +79,7 @@ program sjtucfd_mpi
 	!!                 initialization                    !!
 	!!***************************************************!!
 	call init_readcontrolfile
+	call GetBufferLength(bufferLength, iflag_inviscid)
 	!!read total number of blocks and get myn/lastn
 	if(myid .eq. root)then
 		write (*,*)"***********************************************************"
@@ -442,27 +443,21 @@ program sjtucfd_mpi
 end program    
 
 
-subroutine overlap_checkboundary()
-	use blk_var
-	use index_var
-	use mpi_var
-	use glbindex_var
+subroutine GetBufferLength(numBuffer, inviscidScheme)
 	use flag_var
 	implicit none
 
-	integer:: blk_t
+	integer:: numBuffer, inviscidScheme
 
-	real*8 :: diff = 0.d0
-
-	do m0 = 1,blk_loop
-	do ksub = 1,blk(m0)%num_subface
-		blk_t = blk(m0)%bc(ksub)%blk_t
-		if (blk_t .ge. 0) then
-
-
-		end if
-	end do
-	end do
+	numBuffer = 0;
+	if (inviscidScheme .eq. iflag_3rdweno) then
+		numBuffer = 2
+	end if
+		
+	if (numBuffer .lt. 1) then
+		print *, "Buffer length is not correct, please check the iflag_inviscid!"
+		stop
+	end if
 
 	return
 end subroutine
