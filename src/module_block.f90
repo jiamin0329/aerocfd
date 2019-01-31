@@ -79,6 +79,13 @@ module blk_var
 		real*8,pointer,dimension(:,:,:):: vol
 		real*8,pointer,dimension(:,:,:):: ratio
 
+		!!turbulence model
+		!!turbulent length
+		real*8,pointer,dimension(:,:,:):: length
+		!!spalart-allmaras model
+		real*8,pointer,dimension(:,:,:):: nut
+		real*8,pointer,dimension(:,:,:):: sa_rhs
+
 		type(blockinterface), pointer,dimension(:):: bc
 	end type block_type
 	!!*end block type

@@ -24,7 +24,6 @@ module flag_var
 	!!
 	
 	integer :: bufferLength 
-
 	integer :: isDebug = 0
 
 	!!******************************************************************************************************
@@ -73,10 +72,7 @@ module flag_var
 	integer,parameter :: iflag_7thwcns        =  9 !!(iflag_inviscid)7th wcns scheme
 	!!******************************************************************************************************
 	integer,parameter :: iflag_laminar        =  0 !!(iflag_turbulence)laminar flow
-	integer,parameter :: iflag_bl             =  1 !!(iflag_turbulence)baldwin-lomax model
 	integer,parameter :: iflag_sa             =  2 !!(iflag_turbulence)spalart-allmaras model
-	integer,parameter :: iflag_kwsst_menter   =  3 !!(iflag_turbulence)k-w sst model
-	integer,parameter :: iflag_les            =  4 !!(iflag_turbulence)large-eddy simulation
 	!!******************************************************************************************************
 	integer,parameter :: iflag_des97          =  1 !!(iflag_des)detached-eddy simulation 1997
 	integer,parameter :: iflag_ddes           =  2 !!(iflag_des)delayed detached-eddy simulation

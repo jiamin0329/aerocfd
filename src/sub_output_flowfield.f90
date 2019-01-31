@@ -41,17 +41,18 @@ subroutine flowfield_output
 			idim = ie-is+1
 			jdim = je-js+1
 
-			write(99,*) "variables = x,y,d,u,v,w,p"
+			write(99,*) "variables = x,y,d,u,v,w,p,nut"
 			write(99,*) "zone i= ", idim, "j= ", jdim, "datapacking=point"
 			
 			do j = js,je
 			do i = is,ie
 				write(99,*) blk(m0)%x(i,j,k),blk(m0)%y(i,j,k),   &
-							blk(m0)%pri_v(1,i,j,k),            &
-							blk(m0)%pri_v(2,i,j,k),            &
-							blk(m0)%pri_v(3,i,j,k),            &
-							blk(m0)%pri_v(4,i,j,k),            &
-							blk(m0)%pri_v(5,i,j,k)
+							blk(m0)%pri_v(1,i,j,k),              &
+							blk(m0)%pri_v(2,i,j,k),              &
+							blk(m0)%pri_v(3,i,j,k),              &
+							blk(m0)%pri_v(4,i,j,k),              &
+							blk(m0)%pri_v(5,i,j,k),              &
+							blk(m0)%nut  (  i,j,k)
 			end do
 			end do
 		end do	

@@ -37,7 +37,7 @@ subroutine residual
 			resi_rms(4) = resi_rms(4) + (blk(m0)%rhs(4,i,j,k)*blk(m0)%dt(i,j,k)/blk(m0)%inv_j(i,j,k))**2
 			resi_rms(5) = resi_rms(5) + (blk(m0)%rhs(5,i,j,k)*blk(m0)%dt(i,j,k)/blk(m0)%inv_j(i,j,k))**2
 					
-			resi_tur(1) = 0.d0 !!resi_tur(1) + (blk(m0)%sa_rhs(i,j,k)*blk(m0)%dt(i,j,k))**2
+			resi_tur(1) = resi_tur(1) + (blk(m0)%sa_rhs(i,j,k)*blk(m0)%dt(i,j,k))**2
 		end do
 		end do
 		!!*

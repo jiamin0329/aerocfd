@@ -80,6 +80,11 @@ program sjtucfd_mpi
 	!!***************************************************!!
 	call init_readcontrolfile
 	call GetBufferLength(bufferLength, iflag_inviscid)
+
+	if (iflag_turbulence .ne. iflag_laminar .and. iflag_turbulence .ne. iflag_sa) then 
+		print *, "Wrong turbulence model type is input!!!"
+		stop
+	end if
 	!!read total number of blocks and get myn/lastn
 	if(myid .eq. root)then
 		write (*,*)"***********************************************************"
@@ -326,7 +331,7 @@ program sjtucfd_mpi
 									  is1,ie1,js1,je1,ks1,ke1,m0)
 
 					if (isDebug .eq. 1) then
-						write(debugFile,"('result/debug_rhsv_'I10.10'.dat')"),m0
+						write(debugFile,"('result/debug_rhsv_'I10.10'.dat')"), m0
 						write(*,*) "Writing ", debugFile
 						call DEBUG_OUTPUT_2D_5(debugFile,m0,blk(m0)%rhsv,is,ie,js,je,ks,ke,is0,ie0,js0,je0)
 					end if
@@ -356,8 +361,14 @@ program sjtucfd_mpi
 				!!end do
 				!!end do
 				!!end do
+				!!*	
 				
-				!!*				
+				if(iflag_turbulence .eq. iflag_sa .and. iflag_solver .eq. iflag_nssolver) then
+					call sa_model(blk(m0)%nut,blk(m0)%sa_rhs,blk(m0)%dt,blk(m0)%pri_v,blk(m0)%amu,blk(m0)%dudx,blk(m0)%vor, &
+								  blk(m0)%dxidx,blk(m0)%inv_j,blk(m0)%aalpha,blk(m0)%bbeta,blk(m0)%ggamma, &
+								  blk(m0)%length,blk(m0)%dist,blk(m0)%spacing,re,cfl, &
+								  is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,is1,ie1,js1,je1,ks1,ke1)	
+				end if
 			end do
 
 			!!update boundary condition
@@ -380,6 +391,8 @@ program sjtucfd_mpi
 				ks1 = blk(m0)%ks1;ke1 = blk(m0)%ke1
 				call get_primitivevariables(blk(m0)%pri_v,blk(m0)%q,gamma,cv,is,ie,js,je,ks,ke)
 			end do
+
+
 		end if
 
 		if(mod(timestep,outinterval) .eq. 0)then  !end in line639

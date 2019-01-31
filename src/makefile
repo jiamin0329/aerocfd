@@ -14,7 +14,8 @@ obj_modules = ./obj/module_block.o     \
               ./obj/module_index.o     \
               ./obj/module_mpi.o       \
               ./obj/module_ns_consts.o \
-              ./obj/module_output.o
+              ./obj/module_output.o    \
+              ./obj/module_tursa.o
 
 obj_main = ./obj/main.o
 
@@ -62,6 +63,8 @@ obj_pri = ./obj/sub_getpri_v.o
           
 obj_vis = ./obj/sub_viscous.o  \
           ./obj/sub_secondordercentral.o
+
+obj_tur = ./obj/sub_tur_sa.o
  
 objs = ${obj_modules}  \
        ${obj_main}     \
@@ -71,7 +74,8 @@ objs = ${obj_modules}  \
        ${obj_time}     \
        ${obj_output}   \
        ${obj_vis}      \
-       ${obj_pri}
+       ${obj_pri}      \
+       ${obj_tur}
 
 all:	$(objs)
 	$(fc) -o $(program) $(objs)
@@ -278,8 +282,12 @@ all:	$(objs)
 ./obj/sub_viscous.o: sub_viscous.f90 \
                      module_flags.f90
 	$(fc) -c $(fflag) -o $@ $<	 
+
 ./obj/sub_secondordercentral.o: sub_secondordercentral.f90
 	$(fc) -c $(fflag) -o $@ $<	 	
+
+./obj/sub_tur_sa.o: sub_tur_sa.f90
+	$(fc) -c $(fflag) -o $@ $<	 
 	
 #modules
 ./obj/%.o: %.f90                \
@@ -289,7 +297,8 @@ all:	$(objs)
            module_index.f90     \
            module_mpi.f90       \
            module_ns_consts.f90 \
-           module_output.f90
+           module_output.f90    \
+           module_tursa.f90
 	$(fc) -c $(fflag) -o $@ $<
 #*********************************************************************************************#
 #                              end generate objective files                                   #

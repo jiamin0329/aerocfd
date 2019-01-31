@@ -58,6 +58,9 @@ subroutine average2d1
 						do ind = 1,5
 						blk(m0)%bc(ksub)%buffer_send(1,ind,is_bc,j,k) = blk(m0)%q(ind,is_bc,j,k)
 						end do
+						if (iflag_turbulence .eq. iflag_sa) then
+							blk(m0)%bc(ksub)%buffer_send(1,6,is_bc,j,k) = blk(m0)%nut(is_bc,j,k)
+						end if
 					end do
 				else if(face .eq. 2)then	!!face i+
 					is_bc = blk(m0)%bc(ksub)%is; ie_bc = blk(m0)%bc(ksub)%ie
@@ -65,9 +68,12 @@ subroutine average2d1
 					
 					k = 1
 					do j = js_bc,je_bc
-						do ind = 1,5
+					do ind = 1,5
 						blk(m0)%bc(ksub)%buffer_send(1,ind,ie_bc,j,k) = blk(m0)%q(ind,ie_bc,j,k)
 					end do
+					if (iflag_turbulence .eq. iflag_sa) then
+						blk(m0)%bc(ksub)%buffer_send(1,6,ie_bc,j,k) = blk(m0)%nut(ie_bc,j,k)
+					end if
 					end do					
 				else if(face .eq. 3)then	!!face j-
 					is_bc = blk(m0)%bc(ksub)%is; ie_bc = blk(m0)%bc(ksub)%ie
@@ -78,6 +84,9 @@ subroutine average2d1
 						do ind = 1,5
 						blk(m0)%bc(ksub)%buffer_send(1,ind,i,js_bc,k) = blk(m0)%q(ind,i,js_bc,k)
 					end do
+					if (iflag_turbulence .eq. iflag_sa) then
+						blk(m0)%bc(ksub)%buffer_send(1,6,i,js_bc,k) = blk(m0)%nut(i,js_bc,k)
+					end if
 					end do					
 				else if(face .eq. 4)then	!!face j+
 					is_bc = blk(m0)%bc(ksub)%is; ie_bc = blk(m0)%bc(ksub)%ie
@@ -88,6 +97,9 @@ subroutine average2d1
 						do ind = 1,5
 						blk(m0)%bc(ksub)%buffer_send(1,ind,i,je_bc,k) = blk(m0)%q(ind,i,je_bc,k)
 					end do
+					if (iflag_turbulence .eq. iflag_sa) then
+						blk(m0)%bc(ksub)%buffer_send(1,6,i,je_bc,k) = blk(m0)%nut(i,je_bc,k)
+					end if
 					end do
 				end if
 				!!*						
@@ -307,6 +319,7 @@ subroutine average2d2
 	use index_var
 	use mpi_var
 	use glbindex_var
+	use flag_var
 	implicit none
 
 
@@ -332,8 +345,11 @@ subroutine average2d2
 					k0 = 1
 					do j0 = js_bc,je_bc
 						do ind = 1,5
-						blk(m0)%q(ind,is_bc,j0,k0) = (blk(m0)%q(ind,is_bc,j0,k0) + blk(m0)%bc(ksub)%buffer(ind,is_bc,j0,k0))*0.5d0
+							blk(m0)%q(ind,is_bc,j0,k0) = (blk(m0)%q(ind,is_bc,j0,k0) + blk(m0)%bc(ksub)%buffer(ind,is_bc,j0,k0))*0.5d0
 						end do
+						if (iflag_turbulence .eq. iflag_sa) then
+							blk(m0)%nut(is_bc,j0,k0) = (blk(m0)%nut(is_bc,j0,k0) + blk(m0)%bc(ksub)%buffer(6,is_bc,j0,k0))*0.5d0
+						end if
 					end do
 				end if
 				!!*
@@ -343,8 +359,11 @@ subroutine average2d2
 					k0 = 1
 					do j0 = js_bc,je_bc
 						do ind = 1,5
-						blk(m0)%q(ind,ie_bc,j0,k0) = (blk(m0)%q(ind,ie_bc,j0,k0) + blk(m0)%bc(ksub)%buffer(ind,ie_bc,j0,k0))*0.5d0
-					end do
+							blk(m0)%q(ind,ie_bc,j0,k0) = (blk(m0)%q(ind,ie_bc,j0,k0) + blk(m0)%bc(ksub)%buffer(ind,ie_bc,j0,k0))*0.5d0
+						end do
+						if (iflag_turbulence .eq. iflag_sa) then
+							blk(m0)%nut(ie_bc,j0,k0) = (blk(m0)%nut(ie_bc,j0,k0) + blk(m0)%bc(ksub)%buffer(6,ie_bc,j0,k0))*0.5d0
+						end if
 					end do
 				end if
 				!!*
@@ -354,8 +373,11 @@ subroutine average2d2
 					k0 = 1
 					do i0 = is_bc,ie_bc
 						do ind = 1,5
-						blk(m0)%q(ind,i0,js_bc,k0) = (blk(m0)%q(ind,i0,js_bc,k0) + blk(m0)%bc(ksub)%buffer(ind,i0,js_bc,k0))*0.5d0
-					end do
+							blk(m0)%q(ind,i0,js_bc,k0) = (blk(m0)%q(ind,i0,js_bc,k0) + blk(m0)%bc(ksub)%buffer(ind,i0,js_bc,k0))*0.5d0
+						end do
+						if (iflag_turbulence .eq. iflag_sa) then
+							blk(m0)%nut(i0,js_bc,k0) = (blk(m0)%nut(i0,js_bc,k0) + blk(m0)%bc(ksub)%buffer(6,i0,js_bc,k0))*0.5d0
+						end if
 					end do
 				end if
 				!!*
@@ -365,8 +387,11 @@ subroutine average2d2
 					k0 = 1
 					do i0 = is_bc,ie_bc
 						do ind = 1,5
-						blk(m0)%q(ind,i0,je_bc,k0) = (blk(m0)%q(ind,i0,je_bc,k0) + blk(m0)%bc(ksub)%buffer(ind,i0,je_bc,k0))*0.5d0
-					end do
+							blk(m0)%q(ind,i0,je_bc,k0) = (blk(m0)%q(ind,i0,je_bc,k0) + blk(m0)%bc(ksub)%buffer(ind,i0,je_bc,k0))*0.5d0
+						end do
+						if (iflag_turbulence .eq. iflag_sa) then
+							blk(m0)%nut(i0,je_bc,k0) = (blk(m0)%nut(i0,je_bc,k0) + blk(m0)%bc(ksub)%buffer(6,i0,je_bc,k0))*0.5d0
+						end if
 					end do
 				end if
 			end if

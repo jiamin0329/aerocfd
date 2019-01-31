@@ -317,10 +317,10 @@ subroutine init_allocatememory
 		!!*
 		
 		!!turbulence model
-		!!allocate (blk(m0)%length    (is:ie,js:je,ks:ke))
+		allocate (blk(m0)%length    (is:ie,js:je,ks:ke))
 		!!sa model
-		!!allocate (blk(m0)%nut       (is:ie,js:je,ks:ke))
-		!!allocate (blk(m0)%sa_rhs    (is:ie,js:je,ks:ke))
+		allocate (blk(m0)%nut       (is:ie,js:je,ks:ke))
+		allocate (blk(m0)%sa_rhs    (is:ie,js:je,ks:ke))
 		!!kwsst model
 		!!allocate (blk(m0)%k         (is:ie,js:je,ks:ke))
 		!!allocate (blk(m0)%omg       (is:ie,js:je,ks:ke))

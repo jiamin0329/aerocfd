@@ -14,7 +14,7 @@ subroutine init_flowfield
 	use mpi_var
 	use flag_var
 	use index_var
-	!!use sa_var
+	use sa_var
 	implicit none
 	
 	integer :: i,j,k
@@ -96,13 +96,11 @@ subroutine init_flowfield
 				!!local time step
 				blk(m0)%dt(i,j,k) = dt
 				!!initialize the turbulence model variables
-				!!if (iflag_turbulence .eq. iflag_sa) then
-				!!	blk(m0)%nut      (i,j,k) = nutinf
-				!!	blk(m0)%amu    (2,i,j,k) = 0.009d0
-				!!	blk(m0)%sa_rhs   (i,j,k) = 0.d0
-				!!end if
-				
-				if (iflag_turbulence .eq. iflag_les .or. iflag_turbulence .eq. iflag_laminar) then
+				if (iflag_turbulence .eq. iflag_sa) then
+					blk(m0)%nut      (i,j,k) = nutinf
+					blk(m0)%amu    (2,i,j,k) = 0.009d0
+					blk(m0)%sa_rhs   (i,j,k) = 0.d0
+				else
 					blk(m0)%amu(2,i,j,k) = 0.d0
 				end if
 				
@@ -205,10 +203,9 @@ subroutine init_flowfield
 					
 					blk(m0)%amu (1,i,j,k) = 1.d0
 						
-					!!if      (iflag_turbulence .eq. iflag_sa          ) then
-					!!	blk(m0)%nut(i,j,k) = temptur1(i,j,k)
-					!!else if (iflag_turbulence .eq. iflag_kwsst_menter) then
-					!!end if
+					if      (iflag_turbulence .eq. iflag_sa          ) then
+						blk(m0)%nut(i,j,k) = temptur1(i,j,k)
+					end if
 				end do
 				end do	
 			else if (iflag_dimension .eq. iflag_3d) then
@@ -257,12 +254,9 @@ subroutine init_flowfield
 							
 							blk(m0)%amu (1,i,j,k) = 1.d0
 							
-							!!if      (iflag_turbulence .eq. iflag_sa          ) then
-							!!	blk(m0)%nut(i,j,k) = temptur1(i,j,k)
-							!!else if (iflag_turbulence .eq. iflag_kwsst_menter) then
-                            !!
-							!!end if
-							
+							if      (iflag_turbulence .eq. iflag_sa          ) then
+								blk(m0)%nut(i,j,k) = temptur1(i,j,k)
+							end if
 						end do
 					end do
 				end do			

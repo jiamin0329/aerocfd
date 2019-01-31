@@ -4,7 +4,9 @@
 !! author: Jiamin Xu
 !! date:   2013.08.27
 !!*************************************************************
-subroutine farfield (q,dxidx,d_0,u_0,p_0,c_0,aoa,gamma,face,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
+subroutine farfield (q,tur,dxidx,d_0,u_0,p_0,c_0,aoa,gamma,face,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
+	use sa_var
+	use flag_var
 	implicit none
 	
 	integer :: i,j,k                       !!index
@@ -12,15 +14,16 @@ subroutine farfield (q,dxidx,d_0,u_0,p_0,c_0,aoa,gamma,face,is,ie,js,je,ks,ke,is
 	integer :: is0,ie0,js0,je0,ks0,ke0     !!block dimension
 	integer :: face                        !!face type(1-6)
 	real*8  :: q(5,is0:ie0,js0:je0,ks0:ke0)!!conservative variables
+	real*8  :: tur(is0:ie0,js0:je0,ks0:ke0)!!conservative variables
 	real*8  :: d_0,u_0,p_0,c_0,aoa,gamma
 	real*8  :: dxidx  (9,is0:ie0,js0:je0,ks0:ke0)
-	real*8  :: dxidx2 (3,is0:ie0,js0:je0,ks0:ke0)
 	
 	real*8 :: dxidx0, dxidy0, dxidz0, temp
 	real*8 :: d_inf, u_inf, v_inf, w_inf, p_inf, s_inf, c_inf, vn_inf
 	real*8 :: d_p,   u_p,   v_p,   w_p,   p_p,   s_p,   c_p,   vn_p
 	real*8 :: d_b,   u_b,   v_b,   w_b,   p_b,   s_b,   c_b,   vn_b 
 	real*8 :: u_ref, v_ref, w_ref, u_ref_t
+	real*8 :: turVal
 	real*8 :: rp, rm
 	
 	!!infinite flow condition
@@ -71,6 +74,7 @@ subroutine farfield (q,dxidx,d_0,u_0,p_0,c_0,aoa,gamma,face,is,ie,js,je,ks,ke,is
 					u_ref = u_inf
 					v_ref = v_inf
 					w_ref = w_inf
+					turVal= nutinf
 				end if
 				
 				if(vn_b .ge. 0.d0) then !!*outflow
@@ -78,6 +82,7 @@ subroutine farfield (q,dxidx,d_0,u_0,p_0,c_0,aoa,gamma,face,is,ie,js,je,ks,ke,is
 					u_ref = u_p
 					v_ref = v_p
 					w_ref = w_p
+					turVal=tur(is+1,j,k)
 				end if
 				
 				u_ref_t = u_ref*dxidx0 + v_ref*dxidy0 + w_ref*dxidz0
@@ -93,6 +98,9 @@ subroutine farfield (q,dxidx,d_0,u_0,p_0,c_0,aoa,gamma,face,is,ie,js,je,ks,ke,is
 				q(3,is,j,k) = d_b*v_b
 				q(4,is,j,k) = d_b*w_b
 				q(5,is,j,k) = p_b/(gamma-1.d0) + 0.5d0*d_b*(u_b**2 + v_b**2 + w_b**2)
+				if (iflag_turbulence .ge. 1) then
+					tur(is,j,k) = turVal
+				end if
 			end do
 		end do	
 	end if
@@ -136,6 +144,7 @@ subroutine farfield (q,dxidx,d_0,u_0,p_0,c_0,aoa,gamma,face,is,ie,js,je,ks,ke,is
 					u_ref = u_inf
 					v_ref = v_inf
 					w_ref = w_inf
+					turVal= nutinf
 				end if
 				
 				if(vn_b .ge. 0.d0) then !!*outflow
@@ -143,6 +152,7 @@ subroutine farfield (q,dxidx,d_0,u_0,p_0,c_0,aoa,gamma,face,is,ie,js,je,ks,ke,is
 					u_ref = u_p
 					v_ref = v_p
 					w_ref = w_p
+					turVal=tur(ie-1,j,k)
 				end if
 				
 				u_ref_t = u_ref*dxidx0 + v_ref*dxidy0 + w_ref*dxidz0
@@ -158,6 +168,9 @@ subroutine farfield (q,dxidx,d_0,u_0,p_0,c_0,aoa,gamma,face,is,ie,js,je,ks,ke,is
 				q(3,ie+0,j,k) = d_b*v_b
 				q(4,ie+0,j,k) = d_b*w_b
 				q(5,ie+0,j,k) = p_b/(gamma-1.d0) + 0.5d0*d_b*(u_b**2 + v_b**2 + w_b**2)
+				if (iflag_turbulence .ge. 1) then
+					tur(ie,j,k) = turVal
+				end if
 			end do
 		end do	
 	end if
@@ -201,6 +214,7 @@ subroutine farfield (q,dxidx,d_0,u_0,p_0,c_0,aoa,gamma,face,is,ie,js,je,ks,ke,is
 					u_ref = u_inf
 					v_ref = v_inf
 					w_ref = w_inf
+					turVal= nutinf
 				end if
 				
 				if(vn_b .ge. 0.d0) then !!*outflow
@@ -208,6 +222,7 @@ subroutine farfield (q,dxidx,d_0,u_0,p_0,c_0,aoa,gamma,face,is,ie,js,je,ks,ke,is
 					u_ref = u_p
 					v_ref = v_p
 					w_ref = w_p
+					turVal=tur(i,js+1,k)
 				end if
 				
 				u_ref_t = u_ref*dxidx0 + v_ref*dxidy0 + w_ref*dxidz0
@@ -223,6 +238,9 @@ subroutine farfield (q,dxidx,d_0,u_0,p_0,c_0,aoa,gamma,face,is,ie,js,je,ks,ke,is
 				q(3,i,js,k) = d_b*v_b
 				q(4,i,js,k) = d_b*w_b
 				q(5,i,js,k) = p_b/(gamma-1.d0) + 0.5d0*d_b*(u_b**2 + v_b**2 + w_b**2)
+				if (iflag_turbulence .ge. 1) then
+					tur(i,js,k) = turVal
+				end if
 			end do
 		end do	
 	end if
@@ -266,6 +284,7 @@ subroutine farfield (q,dxidx,d_0,u_0,p_0,c_0,aoa,gamma,face,is,ie,js,je,ks,ke,is
 					u_ref = u_inf
 					v_ref = v_inf
 					w_ref = w_inf
+					turVal= nutinf
 				end if
 				
 				if(vn_b .ge. 0.d0) then !!*outflow
@@ -273,6 +292,7 @@ subroutine farfield (q,dxidx,d_0,u_0,p_0,c_0,aoa,gamma,face,is,ie,js,je,ks,ke,is
 					u_ref = u_p
 					v_ref = v_p
 					w_ref = w_p
+					turVal=tur(i,je-1,k)
 				end if
 				
 				u_ref_t = u_ref*dxidx0 + v_ref*dxidy0 + w_ref*dxidz0
@@ -288,6 +308,9 @@ subroutine farfield (q,dxidx,d_0,u_0,p_0,c_0,aoa,gamma,face,is,ie,js,je,ks,ke,is
 				q(3,i,je,k) = d_b*v_b
 				q(4,i,je,k) = d_b*w_b
 				q(5,i,je,k) = p_b/(gamma-1.d0) + 0.5d0*d_b*(u_b**2 + v_b**2 + w_b**2)
+				if (iflag_turbulence .ge. 1) then
+					tur(i,je,k) = turVal
+				end if
 			end do
 		end do	
 	end if
@@ -331,6 +354,7 @@ subroutine farfield (q,dxidx,d_0,u_0,p_0,c_0,aoa,gamma,face,is,ie,js,je,ks,ke,is
 					u_ref = u_inf
 					v_ref = v_inf
 					w_ref = w_inf
+					turVal= nutinf
 				end if
 				
 				if(vn_b .ge. 0.d0) then !!*outflow
@@ -338,6 +362,7 @@ subroutine farfield (q,dxidx,d_0,u_0,p_0,c_0,aoa,gamma,face,is,ie,js,je,ks,ke,is
 					u_ref = u_p
 					v_ref = v_p
 					w_ref = w_p
+					turVal=tur(i,j,ks+1)
 				end if
 				
 				u_ref_t = u_ref*dxidx0 + v_ref*dxidy0 + w_ref*dxidz0
@@ -353,6 +378,9 @@ subroutine farfield (q,dxidx,d_0,u_0,p_0,c_0,aoa,gamma,face,is,ie,js,je,ks,ke,is
 				q(3,i,j,ks) = d_b*v_b
 				q(4,i,j,ks) = d_b*w_b
 				q(5,i,j,ks) = p_b/(gamma-1.d0) + 0.5d0*d_b*(u_b**2 + v_b**2 + w_b**2)
+				if (iflag_turbulence .ge. 1) then
+					tur(i,j,ks) = turVal
+				end if
 			end do
 		end do	
 	end if
@@ -396,6 +424,7 @@ subroutine farfield (q,dxidx,d_0,u_0,p_0,c_0,aoa,gamma,face,is,ie,js,je,ks,ke,is
 					u_ref = u_inf
 					v_ref = v_inf
 					w_ref = w_inf
+					turVal= nutinf
 				end if
 				
 				if(vn_b .ge. 0.d0) then !!*outflow
@@ -403,6 +432,7 @@ subroutine farfield (q,dxidx,d_0,u_0,p_0,c_0,aoa,gamma,face,is,ie,js,je,ks,ke,is
 					u_ref = u_p
 					v_ref = v_p
 					w_ref = w_p
+					turVal=tur(i,j,ke-1)
 				end if
 				
 				u_ref_t = u_ref*dxidx0 + v_ref*dxidy0 + w_ref*dxidz0
@@ -418,6 +448,9 @@ subroutine farfield (q,dxidx,d_0,u_0,p_0,c_0,aoa,gamma,face,is,ie,js,je,ks,ke,is
 				q(3,i,j,ke) = d_b*v_b
 				q(4,i,j,ke) = d_b*w_b
 				q(5,i,j,ke) = p_b/(gamma-1.d0) + 0.5d0*d_b*(u_b**2 + v_b**2 + w_b**2)
+				if (iflag_turbulence .ge. 1) then
+					tur(i,j,ke) = turVal
+				end if
 			end do
 		end do	
 	end if

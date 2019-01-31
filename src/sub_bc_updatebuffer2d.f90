@@ -60,6 +60,9 @@ subroutine UpdateBuffer2d
 							do ind = 1, 5
 								blk(m0)%bc(ksub)%buffer_send(nBuffer,ind,is_bc,j,k) = blk(m0)%q(ind,is_bc+nBuffer,j,k)
 							end do
+							if (iflag_turbulence .eq. iflag_sa) then
+								blk(m0)%bc(ksub)%buffer_send(nBuffer,6,is_bc,j,k) = blk(m0)%nut(is_bc+nBuffer,j,k)
+							end if
 						end do 
 					end do
 				else if(face .eq. 2)then	!!face i+
@@ -72,6 +75,9 @@ subroutine UpdateBuffer2d
 							do ind = 1, 5
 								blk(m0)%bc(ksub)%buffer_send(nBuffer,ind,ie_bc,j,k) = blk(m0)%q(ind,ie_bc-nBuffer,j,k)
 							end do
+							if (iflag_turbulence .eq. iflag_sa) then
+								blk(m0)%bc(ksub)%buffer_send(nBuffer,6,ie_bc,j,k) = blk(m0)%nut(ie_bc-nBuffer,j,k)
+							end if
 						end do
 					end do					
 				else if(face .eq. 3)then	!!face j-
@@ -84,6 +90,9 @@ subroutine UpdateBuffer2d
 							do ind = 1, 5
 								blk(m0)%bc(ksub)%buffer_send(nBuffer,ind,i,js_bc,k) = blk(m0)%q(ind,i,js_bc+nBuffer,k)
 							end do
+							if (iflag_turbulence .eq. iflag_sa) then
+								blk(m0)%bc(ksub)%buffer_send(nBuffer,6,i,js_bc,k) = blk(m0)%nut(i,js_bc+nBuffer,k)
+							end if
 						end do 
 					end do					
 				else if(face .eq. 4)then	!!face j+
@@ -96,6 +105,9 @@ subroutine UpdateBuffer2d
 							do ind = 1, 5
 								blk(m0)%bc(ksub)%buffer_send(nBuffer,ind,i,je_bc,k) = blk(m0)%q(ind,i,je_bc-nBuffer,k)
 							end do
+							if (iflag_turbulence .eq. iflag_sa) then
+								blk(m0)%bc(ksub)%buffer_send(nBuffer,6,i,je_bc,k) = blk(m0)%nut(i,je_bc-nBuffer,k)
+							end if
 						end do
 					end do
 				end if
@@ -106,9 +118,9 @@ subroutine UpdateBuffer2d
 	!!*end load data to buffer blk
 	
 	!!send buffer data
-	do m0 = 1,blk_loop                             !!start: m0
-		call m02m(m,m0,myid,myn)                     !!start: m
-		do ksub = 1,blk(m0)%num_subface              !!start: ksub
+	do m0 = 1,blk_loop                                 !!start: m0
+		call m02m(m,m0,myid,myn)                       !!start: m
+		do ksub = 1,blk(m0)%num_subface                !!start: ksub
 			blk_t     = blk(m0)%bc(ksub)%blk_t         !!end:   m
 			subface_t = blk(m0)%bc(ksub)%subface_t     !!end:   ksub
 			dest_id   = blk(m0)%bc(ksub)%rank_t        !!end:   rank
@@ -127,7 +139,7 @@ subroutine UpdateBuffer2d
 						do j = js_bc,je_bc
 							do i = is_bc,ie_bc
 								do nBuffer = 1, bufferLength
-									do ind = 1,5
+									do ind = 1,9
 									blk(m00)%bc(subface_t)%buffer_recv(nBuffer,ind,i,j,k) = blk(m0)%bc(ksub)%buffer_send(nBuffer,ind,i,j,k)
 									end do
 								end do 							
@@ -233,6 +245,7 @@ subroutine UpdateBuffer2d
 						ua(:,3,ll0) = blk(m0)%bc(ksub)%buffer_recv(:,3,is_bc_t,js_bc_t+ll0-1,k)
 						ua(:,4,ll0) = blk(m0)%bc(ksub)%buffer_recv(:,4,is_bc_t,js_bc_t+ll0-1,k)
 						ua(:,5,ll0) = blk(m0)%bc(ksub)%buffer_recv(:,5,is_bc_t,js_bc_t+ll0-1,k)
+						ua(:,6,ll0) = blk(m0)%bc(ksub)%buffer_recv(:,6,is_bc_t,js_bc_t+ll0-1,k)
 					end do
 				else if (face_t .eq. 2)then	!!boundary  i+
 					allocate(ua(bufferLength,9,nn))
@@ -243,6 +256,7 @@ subroutine UpdateBuffer2d
 						ua(:,3,ll0) = blk(m0)%bc(ksub)%buffer_recv(:,3,ie_bc_t,js_bc_t+ll0-1,k)
 						ua(:,4,ll0) = blk(m0)%bc(ksub)%buffer_recv(:,4,ie_bc_t,js_bc_t+ll0-1,k)
 						ua(:,5,ll0) = blk(m0)%bc(ksub)%buffer_recv(:,5,ie_bc_t,js_bc_t+ll0-1,k)
+						ua(:,6,ll0) = blk(m0)%bc(ksub)%buffer_recv(:,6,ie_bc_t,js_bc_t+ll0-1,k)
 					end do
 				else if (face_t .eq. 3)then	!!boundary  j-
 					allocate(ua(bufferLength,9,nn))
@@ -253,6 +267,7 @@ subroutine UpdateBuffer2d
 						ua(:,3,ll0) = blk(m0)%bc(ksub)%buffer_recv(:,3,is_bc_t+ll0-1,js_bc_t,k)
 						ua(:,4,ll0) = blk(m0)%bc(ksub)%buffer_recv(:,4,is_bc_t+ll0-1,js_bc_t,k)
 						ua(:,5,ll0) = blk(m0)%bc(ksub)%buffer_recv(:,5,is_bc_t+ll0-1,js_bc_t,k)
+						ua(:,6,ll0) = blk(m0)%bc(ksub)%buffer_recv(:,6,is_bc_t+ll0-1,js_bc_t,k)
 					end do
 				else if (face_t .eq. 4)then	!!boundary  j+
 					allocate(ua(bufferLength,9,nn))
@@ -263,6 +278,7 @@ subroutine UpdateBuffer2d
 						ua(:,3,ll0) = blk(m0)%bc(ksub)%buffer_recv(:,3,is_bc_t+ll0-1,je_bc_t,k)
 						ua(:,4,ll0) = blk(m0)%bc(ksub)%buffer_recv(:,4,is_bc_t+ll0-1,je_bc_t,k)
 						ua(:,5,ll0) = blk(m0)%bc(ksub)%buffer_recv(:,5,is_bc_t+ll0-1,je_bc_t,k)
+						ua(:,6,ll0) = blk(m0)%bc(ksub)%buffer_recv(:,6,is_bc_t+ll0-1,je_bc_t,k)
 					end do
 				end if
 				!!*
@@ -294,6 +310,10 @@ subroutine UpdateBuffer2d
 							blk(m0)%q(3,i0-nBuffer,j0,k0) = ua2(nBuffer,3,j)
 							blk(m0)%q(4,i0-nBuffer,j0,k0) = ua2(nBuffer,4,j)
 							blk(m0)%q(5,i0-nBuffer,j0,k0) = ua2(nBuffer,5,j)
+
+							if (iflag_turbulence .eq. iflag_sa) then
+								blk(m0)%nut(i0-nBuffer,j0,k0) = ua2(nBuffer,6,j)
+							end if
 						end do 
 					end do
 				end if
@@ -311,6 +331,10 @@ subroutine UpdateBuffer2d
 							blk(m0)%q(3,i0+nBuffer,j0,k0) = ua2(nBuffer,3,j)
 							blk(m0)%q(4,i0+nBuffer,j0,k0) = ua2(nBuffer,4,j)
 							blk(m0)%q(5,i0+nBuffer,j0,k0) = ua2(nBuffer,5,j) 
+
+							if (iflag_turbulence .eq. iflag_sa) then
+								blk(m0)%nut(i0+nBuffer,j0,k0) = ua2(nBuffer,6,j)
+							end if
 						end do 
 					end do
 				end if
@@ -328,6 +352,10 @@ subroutine UpdateBuffer2d
 							blk(m0)%q(3,i0,j0-nBuffer,k0) = ua2(nBuffer,3,i)
 							blk(m0)%q(4,i0,j0-nBuffer,k0) = ua2(nBuffer,4,i)
 							blk(m0)%q(5,i0,j0-nBuffer,k0) = ua2(nBuffer,5,i)
+
+							if (iflag_turbulence .eq. iflag_sa) then
+								blk(m0)%nut(i0,j0-nBuffer,k0) = ua2(nBuffer,6,i)
+							end if
 						end do 
 					end do
 				end if
@@ -345,6 +373,10 @@ subroutine UpdateBuffer2d
 							blk(m0)%q(3,i0,j0+nBuffer,k0) = ua2(nBuffer,3,i)
 							blk(m0)%q(4,i0,j0+nBuffer,k0) = ua2(nBuffer,4,i)
 							blk(m0)%q(5,i0,j0+nBuffer,k0) = ua2(nBuffer,5,i)
+
+							if (iflag_turbulence .eq. iflag_sa) then
+								blk(m0)%nut(i0,j0+nBuffer,k0) = ua2(nBuffer,6,i)
+							end if
 						end do
 					end do
 				end if

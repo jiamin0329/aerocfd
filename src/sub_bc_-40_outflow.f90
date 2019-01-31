@@ -3,10 +3,11 @@
 !!
 !!
 !! author: Jiamin Xu
-!! date£º  2013.08.27
+!! dateï¿½ï¿½  2013.08.27
 !!*************************************************************
 !!outflow(blk(m0).q,face,is_bc,ie_bc,js_bc,je_bc,ks_bc,ke_bc,is,ie,js,je,ks,ke)
-subroutine outflow (q,face,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
+subroutine outflow (q,tur,face,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
+	use flag_var
 	implicit none
 	
 	integer :: i,j,k                   !!index
@@ -14,7 +15,8 @@ subroutine outflow (q,face,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
 	integer :: is0,ie0,js0,je0,ks0,ke0 !!block dimension
 	integer :: face
 	real*8  :: q(5,is0:ie0,js0:je0,ks0:ke0)
-    
+	real*8  :: tur(is0:ie0,js0:je0,ks0:ke0)
+	
 	!!subface i-
 	if (face .eq. 1) then
 		do k = ks,ke
@@ -24,6 +26,10 @@ subroutine outflow (q,face,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
 				q(3,is,j,k) = q(3,is+1,j,k)
 				q(4,is,j,k) = q(4,is+1,j,k)
 				q(5,is,j,k) = q(5,is+1,j,k)
+
+				if (iflag_turbulence .ge. 1) then
+					tur(is,j,k) = tur(is+1,j,k)
+				end if
 			end do
 		end do									
 	end if
@@ -38,6 +44,10 @@ subroutine outflow (q,face,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
 				q(3,ie,j,k) = q(3,ie-1,j,k)
 				q(4,ie,j,k) = q(4,ie-1,j,k)
 				q(5,ie,j,k) = q(5,ie-1,j,k)
+
+				if (iflag_turbulence .ge. 1) then
+					tur(ie,j,k) = tur(ie-1,j,k)
+				end if
 			end do
 		end do
 	end if
@@ -52,6 +62,10 @@ subroutine outflow (q,face,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
 				q(3,i,js,k) = q(3,i,js+1,k)
 				q(4,i,js,k) = q(4,i,js+1,k)
 				q(5,i,js,k) = q(5,i,js+1,k)
+
+				if (iflag_turbulence .ge. 1) then
+					tur(i,js,k) = tur(i,js+1,k)
+				end if
 			end do
 		end do	
 	end if
@@ -66,6 +80,10 @@ subroutine outflow (q,face,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
 				q(3,i,je,k) = q(3,i,je-1,k)
 				q(4,i,je,k) = q(4,i,je-1,k)
 				q(5,i,je,k) = q(5,i,je-1,k)
+
+				if (iflag_turbulence .ge. 1) then
+					tur(i,je,k) = tur(i,je-1,k)
+				end if
 			end do
 		end do			
 	end if
@@ -80,6 +98,10 @@ subroutine outflow (q,face,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
 				q(3,i,j,ks) = q(3,i,j,ks+1)
 				q(4,i,j,ks) = q(4,i,j,ks+1)
 				q(5,i,j,ks) = q(5,i,j,ks+1)
+
+				if (iflag_turbulence .ge. 1) then
+					tur(i,j,ks) = tur(i,j,ks+1)
+				end if
 			end do
 		end do	
 	end if
@@ -94,6 +116,11 @@ subroutine outflow (q,face,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
 				q(3,i,j,ke) = q(3,i,j,ke-1)
 				q(4,i,j,ke) = q(4,i,j,ke-1)
 				q(5,i,j,ke) = q(5,i,j,ke-1)
+
+				
+			if (iflag_turbulence .ge. 1) then
+				tur(i,j,ke) = tur(i,j,ke-1)
+			end if
 			end do
 		end do			
 	end if

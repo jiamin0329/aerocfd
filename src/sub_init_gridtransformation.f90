@@ -25,7 +25,7 @@
 !!	Date:   2013.06.11                                                                             
 !!*************************************************************************************************
 subroutine gridtransformation(dxidx,inv_j,alpha,beta,gamma,x,y,z, &
-	                          is,ie,js,je,ks,ke,                                         &
+	                          is,ie,js,je,ks,ke,                  &
 	                          is0,ie0,js0,je0,ks0,ke0,m0)
 	use flag_var
 	implicit none
@@ -99,8 +99,8 @@ subroutine gridtransformation(dxidx,inv_j,alpha,beta,gamma,x,y,z, &
 	!!       get dxdxi,dxdeta,dxdzeta using cmpt scheme         !!
 	!!**********************************************************!! 
 	if      (iflag_dimension .eq. iflag_2d)then
-		call secondordercentral_nd(dxdxi,  xyz, is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,1)
-		call secondordercentral_nd(dxdeta, xyz, is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,2)
+		call secondordercentral_nd(dxdxi, xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,1)
+		call secondordercentral_nd(dxdeta,xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,2)
 		
 		dxdzeta(1,:,:,:) = 0.d0
 		dxdzeta(2,:,:,:) = 0.d0
