@@ -387,9 +387,9 @@ subroutine sa_rhs2(sa_rhs,nut,amu,pri_v,dxidx,inv_j,alpha,beta,gamma,re, &
 		do k = ks1,ke1
 		do j = js1,je1
 		do i = is1,ie1
-			if (j .eq. js) then
+			if (i .eq. is) then
 				tempxi(i,j,k) = temp(i+1,j,k) - temp(i,j,k)
-			else if(j .eq. je) then
+			else if(i .eq. ie) then
 				tempxi(i,j,k) = temp(i,j,k) - temp(i-1,j,k)
 			else
 				tempxi(i,j,k) = (temp(i+1,j,k) - temp(i-1,j,k))/2.d0
