@@ -25,12 +25,17 @@ obj_bc = ./obj/sub_bc.o                \
          ./obj/sub_bc_-30_symm.o       \
          ./obj/sub_bc_-40_outflow.o    \
          ./obj/sub_bc_-50_inflow.o     \
-         ./obj/sub_bc_updatebufferaverage2d.o         \
+         ./obj/sub_bc_updatebufferaverage2d.o \
          ./obj/sub_bc_updatebuffer2d.o \
+         ./obj/sub_bc_updatebuffer.o \
          ./obj/sub_bc_updatebuffercoordinate2d.o \
+         ./obj/sub_bc_updatebuffercoordinate.o \
          ./obj/sub_bc_updatebufferjacobian2d1.o \
+         ./obj/sub_bc_updatebufferjacobian1.o \
          ./obj/sub_bc_updatebufferjacobian2d2.o \
-         ./obj/sub_bc_updatebufferjacobian2d3.o
+         ./obj/sub_bc_updatebufferjacobian2.o \
+         ./obj/sub_bc_updatebufferjacobian2d3.o \
+         ./obj/sub_bc_updatebufferjacobian3.o
        
 
 obj_init = ./obj/sub_init_allocatememory.o     \
@@ -115,7 +120,6 @@ all:	$(objs)
 	$(fc) -c $(fflag) -o $@ $<	
 ./obj/sub_bc_-50_inflow.o: sub_bc_-50_inflow.f90
 	$(fc) -c $(fflag) -o $@ $<		
-	$(fc) -c $(fflag) -o $@ $<
 ./obj/sub_bc_sub_bc_updatebufferaverage2d.o: sub_bc_sub_bc_updatebufferaverage2d.f90  \
                        module_block.f90   \
                        module_index.f90   \
@@ -128,8 +132,22 @@ all:	$(objs)
                                module_mpi.f90            \
                                module_glbindex.f90
 	$(fc) -c $(fflag) -o $@ $<
-	$(fc) -c $(fflag) -o $@ $<	
+
+./obj/sub_bc_updatebuffer.o: sub_bc_updatebuffer.f90 \
+                               module_block.f90          \
+                               module_index.f90          \
+                               module_mpi.f90            \
+                               module_glbindex.f90
+	$(fc) -c $(fflag) -o $@ $<
+
 ./obj/sub_bc_updatebuffercoordinate2d.o: sub_bc_updatebuffercoordinate2d.f90 \
+                               module_block.f90          \
+                               module_index.f90          \
+                               module_mpi.f90            \
+                               module_glbindex.f90
+	$(fc) -c $(fflag) -o $@ $<
+
+./obj/sub_bc_updatebuffercoordinate.o: sub_bc_updatebuffercoordinate.f90 \
                                module_block.f90          \
                                module_index.f90          \
                                module_mpi.f90            \
@@ -142,6 +160,14 @@ all:	$(objs)
                                module_mpi.f90            \
                                module_glbindex.f90
 	$(fc) -c $(fflag) -o $@ $<
+
+./obj/sub_bc_updatebufferjacobian1.o: sub_bc_updatebufferjacobian1.f90 \
+                               module_block.f90          \
+                               module_index.f90          \
+                               module_mpi.f90            \
+                               module_glbindex.f90
+	$(fc) -c $(fflag) -o $@ $<
+
 ./obj/sub_bc_updatebufferjacobian2d2.o: sub_bc_updatebufferjacobian2d2.f90  \
                              module_block.f90         \
                              module_index.f90         \
@@ -149,7 +175,21 @@ all:	$(objs)
                              module_glbindex.f90
 	$(fc) -c $(fflag) -o $@ $<	
 
+./obj/sub_bc_updatebufferjacobian2.o: sub_bc_updatebufferjacobian2.f90  \
+                             module_block.f90         \
+                             module_index.f90         \
+                             module_mpi.f90           \
+                             module_glbindex.f90
+	$(fc) -c $(fflag) -o $@ $<	
+
 ./obj/sub_bc_updatebufferjacobian2d3.o: sub_bc_updatebufferjacobian2d3.f90  \
+                             module_block.f90         \
+                             module_index.f90         \
+                             module_mpi.f90           \
+                             module_glbindex.f90
+	$(fc) -c $(fflag) -o $@ $<	
+
+./obj/sub_bc_updatebufferjacobian3.o: sub_bc_updatebufferjacobian3.f90  \
                              module_block.f90         \
                              module_index.f90         \
                              module_mpi.f90           \
