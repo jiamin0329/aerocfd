@@ -26,6 +26,7 @@ obj_bc = ./obj/sub_bc.o                \
          ./obj/sub_bc_-40_outflow.o    \
          ./obj/sub_bc_-50_inflow.o     \
          ./obj/sub_bc_updatebufferaverage2d.o \
+         ./obj/sub_bc_updatebufferaverage.o \
          ./obj/sub_bc_updatebuffer2d.o \
          ./obj/sub_bc_updatebuffer.o \
          ./obj/sub_bc_updatebuffercoordinate2d.o \
@@ -126,6 +127,14 @@ all:	$(objs)
                        module_mpi.f90     \
                        module_glbindex.f90
 	$(fc) -c $(fflag) -o $@ $<
+
+./obj/sub_bc_sub_bc_updatebufferaverage.o: sub_bc_sub_bc_updatebufferaverage.f90  \
+                       module_block.f90   \
+                       module_index.f90   \
+                       module_mpi.f90     \
+                       module_glbindex.f90
+	$(fc) -c $(fflag) -o $@ $<
+
 ./obj/sub_bc_updatebuffer2d.o: sub_bc_updatebuffer2d.f90 \
                                module_block.f90          \
                                module_index.f90          \
