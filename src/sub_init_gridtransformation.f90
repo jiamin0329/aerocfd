@@ -92,23 +92,27 @@ subroutine gridtransformation(dxidx,inv_j,alpha,beta,gamma,x,y,z, &
 	if (isDebug .eq. 1) then
 		write(debugFile,"('result/DEBUG_xyz_'I10.10'.dat')"),m0
 		write(*,*) "Writing ", debugFile
-		call DEBUG_OUTPUT_2D_3(debugFile,m0,xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0)
+		
+		if      (iflag_dimension .eq. iflag_3d) then
+			call DEBUG_OUTPUT_3D_3(debugFile,m0,xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
+		else if (iflag_dimension .eq. iflag_2d) then
+			call DEBUG_OUTPUT_2D_3(debugFile,m0,xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0)
+		end if
 	end if
 
 	!!**********************************************************!!
 	!!       get dxdxi,dxdeta,dxdzeta using cmpt scheme         !!
 	!!**********************************************************!! 
-	if      (iflag_dimension .eq. iflag_2d)then
-		call secondordercentral_nd(dxdxi, xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,1)
-		call secondordercentral_nd(dxdeta,xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,2)
+	call secondordercentral_nd(dxdxi, xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,1)
+	call secondordercentral_nd(dxdeta,xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,2)
 		
-		dxdzeta(1,:,:,:) = 0.d0
-		dxdzeta(2,:,:,:) = 0.d0
-		dxdzeta(3,:,:,:) = 1.d0
-	else if (iflag_dimension .eq. iflag_3d)then
-		!!call cmpt6(dxdxi,  xyz,is,ie,js,je,ks,ke,3,1)
-		!!call cmpt6(dxdeta, xyz,is,ie,js,je,ks,ke,3,2)
-		!!call cmpt6(dxdzeta,xyz,is,ie,js,je,ks,ke,3,3)
+	dxdzeta(1,:,:,:) = 0.d0
+	dxdzeta(2,:,:,:) = 0.d0
+	dxdzeta(3,:,:,:) = 1.d0
+	if (iflag_dimension .eq. iflag_3d)then
+		call secondordercentral_nd(dxdxi,  xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,1)
+		call secondordercentral_nd(dxdeta, xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,2)
+		call secondordercentral_nd(dxdzeta,xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,3)
 	end if
 	!!*
 	

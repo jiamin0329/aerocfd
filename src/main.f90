@@ -183,7 +183,7 @@ program sjtucfd_mpi
 		                        blk(m0)%aalpha,blk(m0)%bbeta,blk(m0)%ggamma, &
 		                        blk(m0)%x,blk(m0)%y,blk(m0)%z,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,m0)
 	end do
-
+	pause
 	!! Update jacobian variables in buffer block
 	!!call UpdateBufferJacobian2d1
 	call UpdateBufferJacobian1

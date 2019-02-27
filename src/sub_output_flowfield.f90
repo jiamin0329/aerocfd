@@ -522,3 +522,149 @@ subroutine DEBUG_OUTPUT_2D_5(filename,mm,var,is,ie,js,je,ks,ke,is0,ie0,js0,je0)
 	close(99)
 	return
 end subroutine
+
+subroutine DEBUG_OUTPUT_3D_3(filename,mm,var,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
+	use blk_var
+	use mpi_var
+	use index_var
+	use output_var
+	use ns_const
+	use flag_var
+	implicit none
+	
+	integer :: i,j,k,mm
+	integer:: idim,jdim,kdim
+	character(len = 180) :: filename
+	integer :: is,ie,js,je,ks,ke
+	integer :: is0,ie0,js0,je0,ks0,ke0
+	real*8  :: var(3,is:ie,js:je,ks:ke)
+
+	
+	open (99,file = filename)
+	idim = ie0-is0+1
+	jdim = je0-js0+1
+	kdim = ke0-ks0+1
+
+	write(99,*) "variables = x,y,k,var1,var2,var3"
+	write(99,*) "zone i= ", idim, "j= ", jdim, "k= ", kdim, "datapacking=point"
+		
+	do k = ks0,ke0
+	do j = js0,je0
+	do i = is0,ie0
+		write(99,*) blk(mm)%x(i,j,k),blk(mm)%y(i,j,k),blk(mm)%z(i,j,k), &
+			        var(1,i,j,k),var(2,i,j,k),var(3,i,j,k)
+	end do
+	end do
+	end do
+
+	!! buffer block i-
+	idim = is0-is +1
+	jdim = je0-js0+1
+	kdim = ke0-ks0+1
+	if (idim .gt. 1) then
+		write(99,*) "variables = x,y,k,var1,var2,var3"
+		write(99,*) "zone i= ", idim, "j= ", jdim, "k= ", kdim, "datapacking=point"
+			
+		do k = ks0,ke0
+		do j = js0,je0
+		do i = is ,is0
+			write(99,*) blk(mm)%x(i,j,k),blk(mm)%y(i,j,k),blk(mm)%z(i,j,k), &
+				        var(1,i,j,k),var(2,i,j,k),var(3,i,j,k)	
+		end do
+		end do
+		end do
+	end if
+
+	!! buffer block i+
+	idim = ie -ie0+1
+	jdim = je0-js0+1
+	kdim = ke0-ks0+1
+	if (idim .gt. 1) then
+		write(99,*) "variables = x,y,k,var1,var2,var3"
+		write(99,*) "zone i= ", idim, "j= ", jdim, "k= ", kdim, "datapacking=point"
+			
+		do k = ks0,ke0
+		do j = js0,je0
+		do i = ie0,ie
+			write(99,*) blk(mm)%x(i,j,k),blk(mm)%y(i,j,k),blk(mm)%z(i,j,k), &
+				        var(1,i,j,k),var(2,i,j,k),var(3,i,j,k)
+		end do
+		end do
+		end do
+	end if
+
+	!! buffer block j-
+	idim = ie0-is0+1
+	jdim = js0-js +1
+	kdim = ke0-ks0+1
+	if (jdim .gt. 1) then
+		write(99,*) "variables = x,y,k,var1,var2,var3"
+		write(99,*) "zone i= ", idim, "j= ", jdim, "k= ", kdim, "datapacking=point"
+			
+		do k = ks0,ke0
+		do j = js ,js0
+		do i = is0,ie0
+			write(99,*) blk(mm)%x(i,j,k),blk(mm)%y(i,j,k),blk(mm)%z(i,j,k), &
+				        var(1,i,j,k),var(2,i,j,k),var(3,i,j,k)
+		end do
+		end do
+		end do
+	end if
+
+	!! buffer block j+
+	idim = ie0-is0+1
+	jdim = je -je0+1
+	kdim = ke0-ks0+1
+	if (jdim .gt. 1) then
+		write(99,*) "variables = x,y,k,var1,var2,var3"
+		write(99,*) "zone i= ", idim, "j= ", jdim, "k= ", kdim, "datapacking=point"
+			
+		do k = ks0,ke0
+		do j = je0,je
+		do i = is0,ie0
+			write(99,*)blk(mm)%x(i,j,k),blk(mm)%y(i,j,k),blk(mm)%z(i,j,k), &
+				        var(1,i,j,k),var(2,i,j,k),var(3,i,j,k)
+		end do
+		end do
+		end do
+	end if
+
+	!! buffer block k-
+	idim = ie0-is0+1
+	jdim = je0-js0+1
+	kdim = ks0-ks +1
+	if (kdim .gt. 1) then
+		write(99,*) "variables = x,y,k,var1,var2,var3"
+		write(99,*) "zone i= ", idim, "j= ", jdim, "k= ", kdim, "datapacking=point"
+			
+		do k = ks ,ks0
+		do j = js0,je0
+		do i = is0,ie0
+			write(99,*)blk(mm)%x(i,j,k),blk(mm)%y(i,j,k),blk(mm)%z(i,j,k), &
+				        var(1,i,j,k),var(2,i,j,k),var(3,i,j,k)
+		end do
+		end do
+		end do
+	end if
+
+	!! buffer block k+
+	idim = ie0-is0+1
+	jdim = je0-js0+1
+	kdim = ke -ke0+1
+	if (kdim .gt. 1) then
+		write(99,*) "variables = x,y,k,var1,var2,var3"
+		write(99,*) "zone i= ", idim, "j= ", jdim, "k= ", kdim, "datapacking=point"
+			
+		do k = ke0,ke
+		do j = js0,je0
+		do i = is0,ie0
+			write(99,*)blk(mm)%x(i,j,k),blk(mm)%y(i,j,k),blk(mm)%z(i,j,k), &
+				        var(1,i,j,k),var(2,i,j,k),var(3,i,j,k)
+		end do
+		end do
+		end do
+	end if
+
+	close(99)
+	return
+end subroutine
