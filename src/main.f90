@@ -25,8 +25,7 @@ program sjtucfd_mpi
 	integer :: is, ie, js, je, ks, ke  !!block dimension
 
 	character(len = 180) :: debugFile
-	!!bufferLength = 1
-	isDebug = 0
+	isDebug = 1
 
 	!!get mpi info
 	call MPI_INIT(ierr)
@@ -81,10 +80,15 @@ program sjtucfd_mpi
 	call init_readcontrolfile
 	call GetBufferLength(bufferLength, iflag_inviscid)
 
+	if (isDebug .eq. 1) then
+		write (*,*) "Debug info: buffer length: ", bufferLength  
+	end if
+
 	if (iflag_turbulence .ne. iflag_laminar .and. iflag_turbulence .ne. iflag_sa) then 
 		print *, "Wrong turbulence model type is input!!!"
 		stop
 	end if
+
 	!!read total number of blocks and get myn/lastn
 	if(myid .eq. root)then
 		write (*,*)"***********************************************************"
@@ -124,7 +128,8 @@ program sjtucfd_mpi
 	call init_readbcinfo
 	call init_allocatememory
 	call init_readbcinfo2
-	call UpdateBufferCoordinate2d
+	!!call UpdateBufferCoordinate2d
+	call UpdateBufferCoordinate
 	call init_flowfield
 	
 	!!grid spacing calculation
@@ -180,11 +185,14 @@ program sjtucfd_mpi
 	end do
 
 	!! Update jacobian variables in buffer block
-	call UpdateBufferJacobian2d1
+	!!call UpdateBufferJacobian2d1
+	call UpdateBufferJacobian1
 	call MPI_BARRIER(MPI_COMM_WORLD,ierr)
-	call UpdateBufferJacobian2d2
+	!!call UpdateBufferJacobian2d2
+	call UpdateBufferJacobian2
 	call MPI_BARRIER(MPI_COMM_WORLD,ierr)
-	call UpdateBufferJacobian2d3
+	!!call UpdateBufferJacobian2d3
+	call UpdateBufferJacobian3
 	call MPI_BARRIER(MPI_COMM_WORLD,ierr)
 
 	if (isDebug .eq. 1) then

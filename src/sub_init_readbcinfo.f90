@@ -457,8 +457,6 @@ subroutine init_readbcinfo2
 				blk(m0)%bc(ksub)%buffer_recv     = 0.d0
 				!!blk(m0)%bc(ksub)%buffer_send_tur = 0.d0
 				!!blk(m0)%bc(ksub)%buffer_recv_tur = 0.d0
-
-
 			end if
 		end do
 	end do

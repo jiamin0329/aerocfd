@@ -127,7 +127,7 @@ subroutine UpdateBufferCoordinate
 			subface_t = blk(m0)%bc(ksub)%subface_t     !!end:   ksub
 			dest_id   = blk(m0)%bc(ksub)%rank_t        !!end:   rank
 			if (blk_t .ge. 0) then
-				dim_f     = bufferLength*3*blk(m0)%bc(ksub)%dim_f
+				dim_f     = bufferLength*9*blk(m0)%bc(ksub)%dim_f
 				itag      = 100000*blk(m0)%bc(ksub)%f_no + m
 				if     (dest_id .ne. myid)then
 					call MPI_isend(blk(m0)%bc(ksub)%buffer_send,dim_f,       &
@@ -163,7 +163,7 @@ subroutine UpdateBufferCoordinate
 			source_id = blk(m0)%bc(ksub)%rank_t
 			if (blk_t .ge. 0) then
 				if (source_id .ne. myid)then
-					dim_f     = bufferLength*3*blk(m0)%bc(ksub)%dim_f
+					dim_f     = bufferLength*9*blk(m0)%bc(ksub)%dim_f
 					itag      = 100000*subface_t + blk_t
 					m00       = blk_t - source_id*myn
 					call MPI_irecv(blk(m0)%bc(ksub)%buffer_recv,dim_f,       &
@@ -438,9 +438,9 @@ subroutine UpdateBufferCoordinate
 						k0 = ks_bc
 						
 						do nBuffer = 1, bufferLength
-							blk(m0)%x(i0,j0+nBuffer,k0) = ua2(nBuffer,1,i,j) 
-							blk(m0)%y(i0,j0+nBuffer,k0) = ua2(nBuffer,2,i,j)
-							blk(m0)%z(i0,j0+nBuffer,k0) = ua2(nBuffer,3,i,j)
+							blk(m0)%x(i0,j0,k0-nBuffer) = ua2(nBuffer,1,i,j) 
+							blk(m0)%y(i0,j0,k0-nBuffer) = ua2(nBuffer,2,i,j)
+							blk(m0)%z(i0,j0,k0-nBuffer) = ua2(nBuffer,3,i,j)
 						end do
 					end do
 					end do
@@ -455,9 +455,9 @@ subroutine UpdateBufferCoordinate
 						k0 = ke_bc
 								
 						do nBuffer = 1, bufferLength
-							blk(m0)%x(i0,j0+nBuffer,k0) = ua2(nBuffer,1,i,j) 
-							blk(m0)%y(i0,j0+nBuffer,k0) = ua2(nBuffer,2,i,j)
-							blk(m0)%z(i0,j0+nBuffer,k0) = ua2(nBuffer,3,i,j)
+							blk(m0)%x(i0,j0,k0+nBuffer) = ua2(nBuffer,1,i,j) 
+							blk(m0)%y(i0,j0,k0+nBuffer) = ua2(nBuffer,2,i,j)
+							blk(m0)%z(i0,j0,k0+nBuffer) = ua2(nBuffer,3,i,j)
 						end do
 					end do
 					end do
