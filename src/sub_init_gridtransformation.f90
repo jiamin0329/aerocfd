@@ -210,7 +210,54 @@ subroutine gridtransformation(dxidx,inv_j,alpha,beta,gamma,x,y,z, &
 		end do
 		end do
 	else if (iflag_dimension .eq. iflag_3d)then
-
+		do k = ks,ke
+		do j = js,je
+		do i = is,ie
+			tempxi  (1,i,j,k) = dxdzeta(2,i,j,k)*xyz(3,i,j,k)
+			tempxi  (2,i,j,k) = dxdzeta(3,i,j,k)*xyz(1,i,j,k)
+			tempxi  (3,i,j,k) = dxdzeta(1,i,j,k)*xyz(2,i,j,k)
+			tempxi  (4,i,j,k) = dxdeta (2,i,j,k)*xyz(3,i,j,k)
+			tempxi  (5,i,j,k) = dxdeta (3,i,j,k)*xyz(1,i,j,k)
+			tempxi  (6,i,j,k) = dxdeta (1,i,j,k)*xyz(2,i,j,k)
+						
+			tempeta (1,i,j,k) = dxdzeta(2,i,j,k)*xyz(3,i,j,k)
+			tempeta (2,i,j,k) = dxdzeta(3,i,j,k)*xyz(1,i,j,k)
+			tempeta (3,i,j,k) = dxdzeta(1,i,j,k)*xyz(2,i,j,k)
+			tempeta (4,i,j,k) = dxdxi  (2,i,j,k)*xyz(3,i,j,k)
+			tempeta (5,i,j,k) = dxdxi  (3,i,j,k)*xyz(1,i,j,k)
+			tempeta (6,i,j,k) = dxdxi  (1,i,j,k)*xyz(2,i,j,k)				
+						
+			tempzeta(1,i,j,k) = dxdeta (2,i,j,k)*xyz(3,i,j,k)
+			tempzeta(2,i,j,k) = dxdeta (3,i,j,k)*xyz(1,i,j,k)
+			tempzeta(3,i,j,k) = dxdeta (1,i,j,k)*xyz(2,i,j,k)
+			tempzeta(4,i,j,k) = dxdxi  (2,i,j,k)*xyz(3,i,j,k)
+			tempzeta(5,i,j,k) = dxdxi  (3,i,j,k)*xyz(1,i,j,k)
+			tempzeta(6,i,j,k) = dxdxi  (1,i,j,k)*xyz(2,i,j,k)
+		end do
+		end do
+		end do
+			
+		call secondordercentral_nd(tempxixi,    tempxi,  is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,6,1)
+		call secondordercentral_nd(tempetaeta,  tempeta, is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,6,2)
+		call secondordercentral_nd(tempzetazeta,tempzeta,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,6,3)
+	
+		do k = ks,ke
+		do j = js,je
+		do i = is,ie
+			dxidx(1,i,j,k) = (tempzetazeta(1,i,j,k) - tempetaeta  (1,i,j,k))/inv_j(i,j,k)
+			dxidx(2,i,j,k) = (tempzetazeta(2,i,j,k) - tempetaeta  (2,i,j,k))/inv_j(i,j,k)
+			dxidx(3,i,j,k) = (tempzetazeta(3,i,j,k) - tempetaeta  (3,i,j,k))/inv_j(i,j,k)
+							
+			dxidx(4,i,j,k) = (tempxixi    (1,i,j,k) - tempzetazeta(4,i,j,k))/inv_j(i,j,k)
+			dxidx(5,i,j,k) = (tempxixi    (2,i,j,k) - tempzetazeta(5,i,j,k))/inv_j(i,j,k)
+			dxidx(6,i,j,k) = (tempxixi    (3,i,j,k) - tempzetazeta(6,i,j,k))/inv_j(i,j,k)
+							
+			dxidx(7,i,j,k) = (tempetaeta  (4,i,j,k) - tempxixi    (4,i,j,k))/inv_j(i,j,k)
+			dxidx(8,i,j,k) = (tempetaeta  (5,i,j,k) - tempxixi    (5,i,j,k))/inv_j(i,j,k)
+			dxidx(9,i,j,k) = (tempetaeta  (6,i,j,k) - tempxixi    (6,i,j,k))/inv_j(i,j,k)
+		end do
+		end do
+		end do
 	end if
 
 	if (isDebug .eq. 1) then

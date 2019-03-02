@@ -263,7 +263,6 @@ subroutine UpdateBufferCoordinate
 				!!*
 
 				!!load buffer_recv to ua
-				print *, l1,m1
 				allocate(ua(bufferLength,3,l1,m1))
 				if      (face_t .eq. 1)then	!!boundary  i-
 					do mm0 = 1,m1

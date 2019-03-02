@@ -293,8 +293,8 @@ subroutine UpdateBufferJacobian1
 				
 				ori = blk(m0)%bc(ksub)%ori
 				if      (ori .eq. 1)then
-					l2 = m1
-					m2 = l1
+					l2 = l1
+					m2 = m1
 					allocate(ua2(bufferLength,9,l2,m2))
 					do mm = 1,m2
 					do ll = 1,l2
@@ -404,7 +404,7 @@ subroutine UpdateBufferJacobian1
 						k0 = ks_bc
 						
 						do nBuffer = 1, bufferLength
-							blk(m0)%dxidx(:,i0,j0,k0-nBuffer) = ua2(nBuffer,:,i,k)
+							blk(m0)%dxidx(:,i0,j0,k0-nBuffer) = ua2(nBuffer,:,i,j)
 						end do
 					end do
 					end do
@@ -419,7 +419,7 @@ subroutine UpdateBufferJacobian1
 						k0 = ke_bc
 								
 						do nBuffer = 1, bufferLength
-							blk(m0)%dxidx(:,i0,j0,k0+nBuffer) = ua2(nBuffer,:,i,k)
+							blk(m0)%dxidx(:,i0,j0,k0+nBuffer) = ua2(nBuffer,:,i,j)
 						end do
 					end do
 					end do
