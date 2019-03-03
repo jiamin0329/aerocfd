@@ -25,7 +25,7 @@ program sjtucfd_mpi
 	integer :: is, ie, js, je, ks, ke  !!block dimension
 
 	character(len = 180) :: debugFile
-	isDebug = 1
+	isDebug = 0
 
 	!!get mpi info
 	call MPI_INIT(ierr)
@@ -155,7 +155,10 @@ program sjtucfd_mpi
 	if(myid .eq. root)then
 		write(*,*) 'Finish computing grid space!'
 	end if
-	call init_walldist
+
+	if(iflag_solver .eq. iflag_nssolver) then
+		call init_walldist
+	end if
 
 	if(myid .eq. root)then
 		write(*,*) 'Finish computing walldistance!'
@@ -207,17 +210,22 @@ program sjtucfd_mpi
 		
 		write(debugFile,"('result/debug_invJac_'I10.10'.dat')"),m0
 		write(*,*) "Writing ", debugFile
-		call DEBUG_OUTPUT_2D_1(debugFile,m0,blk(m0)%inv_j,is,ie,js,je,ks,ke,is0,ie0,js0,je0)
+		!!call DEBUG_OUTPUT_2D_1(debugFile,m0,blk(m0)%inv_j,is,ie,js,je,ks,ke,is0,ie0,js0,je0)
+		call DEBUG_OUTPUT_3D_1(debugFile,m0,blk(m0)%inv_j,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
 		write(debugFile,"('result/debug_alpha_'I10.10'.dat')"),m0
 		write(*,*) "Writing ", debugFile
-		call DEBUG_OUTPUT_2D_3(debugFile,m0,blk(m0)%aalpha,is,ie,js,je,ks,ke,is0,ie0,js0,je0)
+		!!call DEBUG_OUTPUT_2D_3(debugFile,m0,blk(m0)%aalpha,is,ie,js,je,ks,ke,is0,ie0,js0,je0)
+		call DEBUG_OUTPUT_3D_3(debugFile,m0,blk(m0)%aalpha,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
 		write(debugFile,"('result/debug_beta_'I10.10'.dat')"),m0
 		write(*,*) "Writing ", debugFile
-		call DEBUG_OUTPUT_2D_3(debugFile,m0,blk(m0)%bbeta,is,ie,js,je,ks,ke,is0,ie0,js0,je0)
+		!!call DEBUG_OUTPUT_2D_3(debugFile,m0,blk(m0)%bbeta,is,ie,js,je,ks,ke,is0,ie0,js0,je0)
+		call DEBUG_OUTPUT_3D_3(debugFile,m0,blk(m0)%bbeta,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
 		write(debugFile,"('result/debug_gamma_'I10.10'.dat')"),m0
 		write(*,*) "Writing ", debugFile
-		call DEBUG_OUTPUT_2D_3(debugFile,m0,blk(m0)%ggamma,is,ie,js,je,ks,ke,is0,ie0,js0,je0)
+		!!call DEBUG_OUTPUT_2D_3(debugFile,m0,blk(m0)%ggamma,is,ie,js,je,ks,ke,is0,ie0,js0,je0)
+		call DEBUG_OUTPUT_3D_3(debugFile,m0,blk(m0)%ggamma,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
 	end do
+	!!pause
 	end if
 	
 	if(myid .eq. root)then
@@ -236,7 +244,7 @@ program sjtucfd_mpi
 		js = blk(m0)%js;je = blk(m0)%je
 		ks = blk(m0)%ks;ke = blk(m0)%ke
 		
-		call get_primitivevariables(blk(m0)%pri_v,blk(m0)%q,gamma,cv,is,ie,js,je,ks,ke)
+		call get_primitivevariables(m0,blk(m0)%pri_v,blk(m0)%q,gamma,cv,is,ie,js,je,ks,ke)
 	end do
 	
 	!!***************************************************!!
@@ -278,9 +286,12 @@ program sjtucfd_mpi
 	!!***************************************************!!
 	!! update main equation in buffer block
 	call physical_bc
-	call UpdateBuffer2d
-	call average2d1
-	call average2d2
+	!!call UpdateBuffer2d
+	!!call average2d1
+	!!call average2d2
+	call UpdateBuffer
+	call average1
+	call average2
 	call MPI_BARRIER(MPI_COMM_WORLD,ierr)  
 
 	if (isDebug .eq. 1) then
@@ -318,18 +329,20 @@ program sjtucfd_mpi
 				js1 = blk(m0)%js1;je1 = blk(m0)%je1
 				ks1 = blk(m0)%ks1;ke1 = blk(m0)%ke1
 
-				call get_primitivevariables(blk(m0)%pri_v,blk(m0)%q,gamma,cv,is,ie,js,je,ks,ke)
+				call get_primitivevariables(m0,blk(m0)%pri_v,blk(m0)%q,gamma,cv,is,ie,js,je,ks,ke)
 
 				call inviscid_flux_1(blk(m0)%rhsi,blk(m0)%q,blk(m0)%dxidx,blk(m0)%inv_j, &
 									 is,ie,js,je,ks,ke, &
 									 is0,ie0,js0,je0,ks0,ke0, &
-									 is1,ie1,js1,je1,ks1,ke1,gamma)
-				
+									 is1,ie1,js1,je1,ks1,ke1,gamma)		
+
 				if (isDebug .eq. 1) then
 					write(debugFile,"('result/debug_rhsi_'I10.10'.dat')"),m0
 					write(*,*) "Writing ", debugFile
-					call DEBUG_OUTPUT_2D_5(debugFile,m0,blk(m0)%rhsi,is,ie,js,je,ks,ke,is0,ie0,js0,je0)
+					!!call DEBUG_OUTPUT_2D_5(debugFile,m0,blk(m0)%rhsi,is,ie,js,je,ks,ke,is0,ie0,js0,je0)
+					call DEBUG_OUTPUT_3D_5(debugFile,m0,blk(m0)%rhsi,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
 				end if
+				
 
 				if(iflag_solver .eq. iflag_nssolver) then
 					call viscous_flux(blk(m0)%rhsv,blk(m0)%pri_v,blk(m0)%amu,blk(m0)%vor,blk(m0)%dudx,blk(m0)%tao, &
@@ -341,7 +354,8 @@ program sjtucfd_mpi
 					if (isDebug .eq. 1) then
 						write(debugFile,"('result/debug_rhsv_'I10.10'.dat')"), m0
 						write(*,*) "Writing ", debugFile
-						call DEBUG_OUTPUT_2D_5(debugFile,m0,blk(m0)%rhsv,is,ie,js,je,ks,ke,is0,ie0,js0,je0)
+						!!call DEBUG_OUTPUT_2D_5(debugFile,m0,blk(m0)%rhsv,is,ie,js,je,ks,ke,is0,ie0,js0,je0)
+						call DEBUG_OUTPUT_3D_5(debugFile,m0,blk(m0)%rhsv,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
 					end if
 				end if
 				!!*
@@ -353,19 +367,20 @@ program sjtucfd_mpi
 				if (isDebug .eq. 1) then
 					write(debugFile,"('result/debug_dt_'I10.10'.dat')"),m0
 					write(*,*) "Writing ", debugFile
-					call DEBUG_OUTPUT_2D_1(debugFile,m0,blk(m0)%dt,is,ie,js,je,ks,ke,is0,ie0,js0,je0)
+					!!call DEBUG_OUTPUT_2D_1(debugFile,m0,blk(m0)%dt,is,ie,js,je,ks,ke,is0,ie0,js0,je0)
+					!!call DEBUG_OUTPUT_3D_1(debugFile,m0,blk(m0)%dt,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
 				end if
 
 				call implicit1st(blk(m0)%q,blk(m0)%dt,blk(m0)%pri_v,blk(m0)%rhs,blk(m0)%rhsi,blk(m0)%rhsv, &
 								 blk(m0)%dxidx,blk(m0)%inv_j, &
-								 is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,is1,ie1,js1,je1,ks1,ke1, &
+							     is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,is1,ie1,js1,je1,ks1,ke1, &
 								 gamma,cfl,blk(m0)%x,blk(m0)%y,blk(m0)%z)
 
 				!!do k = ks1,ke1
 				!!do j = js1,je1
 				!!do i = is1,ie1
 				!!	blk(m0)%q(:,i,j,k) = blk(m0)%q(:,i,j,k) + blk(m0)%dt(i,j,k) * & 
-				!!	                    (blk(m0)%rhsi(:,i,j,k)+blk(m0)%rhsv(:,i,j,k))/blk(m0)%inv_j(i,j,k)
+				!!						(blk(m0)%rhsi(:,i,j,k))/blk(m0)%inv_j(i,j,k)				
 				!!end do
 				!!end do
 				!!end do
@@ -381,9 +396,9 @@ program sjtucfd_mpi
 
 			!!update boundary condition
 			call physical_bc
-			call UpdateBuffer2d
-			call average2d1
-			call average2d2
+			call UpdateBuffer
+			call average1
+			call average2
 
 			do m0 = 1,blk_loop
 				is  = blk(m0)%is; ie  = blk(m0)%ie
@@ -397,7 +412,7 @@ program sjtucfd_mpi
 				is1 = blk(m0)%is1;ie1 = blk(m0)%ie1
 				js1 = blk(m0)%js1;je1 = blk(m0)%je1
 				ks1 = blk(m0)%ks1;ke1 = blk(m0)%ke1
-				call get_primitivevariables(blk(m0)%pri_v,blk(m0)%q,gamma,cv,is,ie,js,je,ks,ke)
+				call get_primitivevariables(m0,blk(m0)%pri_v,blk(m0)%q,gamma,cv,is,ie,js,je,ks,ke)
 			end do
 
 

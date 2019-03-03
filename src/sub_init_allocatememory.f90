@@ -390,12 +390,12 @@ subroutine init_allocatememory
 				tempz = 0.d0
 
 				do k = ks0,ke0
-					do j = js0,je0
-						do i = is0,ie0
-							tempx(i,j,k) = tempx(i,j,k)*scale_x/lref
-							tempy(i,j,k) = tempy(i,j,k)*scale_y/lref
-						end do
-					end do
+				do j = js0,je0
+				do i = is0,ie0
+					tempx(i,j,k) = tempx(i,j,k)*scale_x/lref
+					tempy(i,j,k) = tempy(i,j,k)*scale_y/lref
+				end do
+				end do
 				end do  
 			else if(iflag_dimension .eq. iflag_3d)then
 				read(99,*)(((tempx(i,j,k),i=is0,ie0), j=js0,je0), k=ks0,ke0), &
@@ -403,13 +403,13 @@ subroutine init_allocatememory
 						  (((tempz(i,j,k),i=is0,ie0), j=js0,je0), k=ks0,ke0)
 			          	
 				do k = ks0,ke0
-					do j = js0,je0
-						do i = is0,ie0
-							tempx(i,j,k) = tempx(i,j,k)*scale_x/lref
-							tempy(i,j,k) = tempy(i,j,k)*scale_y/lref
-							tempz(i,j,k) = tempz(i,j,k)*scale_z/lref
-						end do
-					end do
+				do j = js0,je0
+				do i = is0,ie0
+					tempx(i,j,k) = tempx(i,j,k)*scale_x/lref
+					tempy(i,j,k) = tempy(i,j,k)*scale_y/lref
+					tempz(i,j,k) = tempz(i,j,k)*scale_z/lref
+				end do
+				end do
 				end do
 				!!*
 			end if

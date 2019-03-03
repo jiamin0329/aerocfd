@@ -61,6 +61,7 @@ subroutine physical_bc
 	end do
 
 
+	if(iflag_turbulence .eq. iflag_sa .and. iflag_solver .eq. iflag_nssolver) then
 	do m0 = 1,blk_loop
 		is = blk(m0)%is; ie = blk(m0)%ie
 		js = blk(m0)%js; je = blk(m0)%je
@@ -82,6 +83,7 @@ subroutine physical_bc
 		end do
 		end do	
 	end do    
+	end if
 
 	return
 end subroutine

@@ -287,38 +287,51 @@ subroutine sa_rhs2(sa_rhs,nut,amu,pri_v,dxidx,inv_j,alpha,beta,gamma,re, &
 	tempy     = 0.d0
 	tempz     = 0.d0
 	
-	if      (iflag_dimension .eq. iflag_2d) then
-		do k = ks1,ke1
-		do j = js1,je1
-		do i = is1,ie1
-			if (j .eq. js) then
-				dnutdxi(i,j,k) = nut(i+1,j,k) - nut(i,j,k)
-			else if(j .eq. je) then
-				dnutdxi(i,j,k) = nut(i,j,k) - nut(i-1,j,k)
-			else
-				dnutdxi(i,j,k) = (nut(i+1,j,k) - nut(i-1,j,k))/2.d0
-			end if    
-		end do
-		end do
-		end do	
+	
+	do k = ks1,ke1
+	do j = js1,je1
+	do i = is1,ie1
+		if (j .eq. js) then
+			dnutdxi(i,j,k) = nut(i+1,j,k) - nut(i,j,k)
+		else if(j .eq. je) then
+			dnutdxi(i,j,k) = nut(i,j,k) - nut(i-1,j,k)
+		else
+			dnutdxi(i,j,k) = (nut(i+1,j,k) - nut(i-1,j,k))/2.d0
+		end if    
+	end do
+	end do
+	end do	
 		
-		do k = ks1,ke1
-		do j = js1,je1
-		do i = is1,ie1
-			if (j .eq. js) then
-				dnutdeta(i,j,k) = nut(i,j+1,k) - nut(i,j,k)
-			else if(j .eq. je) then
-				dnutdeta(i,j,k) = nut(i,j,k) - nut(i,j-1,k)
-			else
-				dnutdeta(i,j,k) = (nut(i,j+1,k) - nut(i,j-1,k))/2.d0
-			end if    
-		end do
-		end do
-		end do	
+	do k = ks1,ke1
+	do j = js1,je1
+	do i = is1,ie1
+		if (j .eq. js) then
+			dnutdeta(i,j,k) = nut(i,j+1,k) - nut(i,j,k)
+		else if(j .eq. je) then
+			dnutdeta(i,j,k) = nut(i,j,k) - nut(i,j-1,k)
+		else
+			dnutdeta(i,j,k) = (nut(i,j+1,k) - nut(i,j-1,k))/2.d0
+		end if    
+	end do
+	end do
+	end do
 
+	if      (iflag_dimension .eq. iflag_2d) then
 		dnutdzeta = 0.d0
 	else if (iflag_dimension .eq. iflag_3d) then
-
+		do k = ks1,ke1
+		do j = js1,je1
+		do i = is1,ie1
+			if     (k .eq. ks) then
+				dnutdxi(i,j,k) = nut(i,j,k+1) - nut(i,j,k)
+			else if(k .eq. ke) then
+				dnutdxi(i,j,k) = nut(i,j,k) - nut(i,j,k-1)
+			else
+				dnutdxi(i,j,k) = (nut(i,j,k+1) - nut(i,j,k-1))/2.d0
+			end if    
+		end do
+		end do
+		end do	
 	end if
     
 	do k = ks1,ke1
@@ -339,38 +352,51 @@ subroutine sa_rhs2(sa_rhs,nut,amu,pri_v,dxidx,inv_j,alpha,beta,gamma,re, &
 	end do
 	end do
 	
-	if      (iflag_dimension .eq. iflag_2d)then
-		do k = ks1,ke1
-		do j = js1,je1
-		do i = is1,ie1
-			if (j .eq. js) then
-				tempa(i,j,k) = tempalpha(i+1,j,k) - tempalpha(i,j,k)
-			else if(j .eq. je) then
-				tempa(i,j,k) = tempalpha(i,j,k) - tempalpha(i-1,j,k)
-			else
-				tempa(i,j,k) = (tempalpha(i+1,j,k) - tempalpha(i-1,j,k))/2.d0
-			end if    
-		end do
-		end do
-		end do	
 	
-		do k = ks1,ke1
-		do j = js1,je1
-		do i = is1,ie1
-			if (j .eq. js) then
-				tempb(i,j,k) = tempbeta(i,j+1,k) - tempbeta(i,j,k)
-			else if(j .eq. je) then
-				tempb(i,j,k) = tempbeta(i,j,k) - tempbeta(i,j-1,k)
-			else
-				tempb(i,j,k) = (tempbeta(i,j+1,k) - tempbeta(i,j-1,k))/2.d0
-			end if    
-		end do
-		end do
-		end do	
+	do k = ks1,ke1
+	do j = js1,je1
+	do i = is1,ie1
+		if (j .eq. js) then
+			tempa(i,j,k) = tempalpha(i+1,j,k) - tempalpha(i,j,k)
+		else if(j .eq. je) then
+			tempa(i,j,k) = tempalpha(i,j,k) - tempalpha(i-1,j,k)
+		else
+			tempa(i,j,k) = (tempalpha(i+1,j,k) - tempalpha(i-1,j,k))/2.d0
+		end if    
+	end do
+	end do
+	end do	
+	
+	do k = ks1,ke1
+	do j = js1,je1
+	do i = is1,ie1
+		if     (j .eq. js) then
+			tempb(i,j,k) = tempbeta(i,j+1,k) - tempbeta(i,j,k)
+		else if(j .eq. je) then
+			tempb(i,j,k) = tempbeta(i,j,k) - tempbeta(i,j-1,k)
+		else
+			tempb(i,j,k) = (tempbeta(i,j+1,k) - tempbeta(i,j-1,k))/2.d0
+		end if    
+	end do
+	end do
+	end do	
 
+	if      (iflag_dimension .eq. iflag_2d)then
 		tempc = 0.d0
 	else if (iflag_dimension .eq. iflag_3d)then
-
+		do k = ks1,ke1
+		do j = js1,je1
+		do i = is1,ie1
+			if     (k .eq. ks) then
+				tempb(i,j,k) = tempbeta(i,j,k+1) - tempbeta(i,j,k)
+			else if(k .eq. ke) then
+				tempb(i,j,k) = tempbeta(i,j,k) - tempbeta(i,j,k-1)
+			else
+				tempb(i,j,k) = (tempbeta(i,j,k+1) - tempbeta(i,j,k-1))/2.d0
+			end if    
+		end do
+		end do
+		end do
 	end if
     
 	do k = ks1,ke1
@@ -383,38 +409,51 @@ subroutine sa_rhs2(sa_rhs,nut,amu,pri_v,dxidx,inv_j,alpha,beta,gamma,re, &
 	end do
 	end do
 	
+	
+	do k = ks1,ke1
+	do j = js1,je1
+	do i = is1,ie1
+		if (i .eq. is) then
+			tempxi(i,j,k) = temp(i+1,j,k) - temp(i,j,k)
+		else if(i .eq. ie) then
+			tempxi(i,j,k) = temp(i,j,k) - temp(i-1,j,k)
+		else
+			tempxi(i,j,k) = (temp(i+1,j,k) - temp(i-1,j,k))/2.d0
+		end if    
+	end do
+	end do
+	end do	
+
+	do k = ks1,ke1
+	do j = js1,je1
+	do i = is1,ie1
+		if (j .eq. js) then
+			tempeta(i,j,k) = temp(i,j+1,k) - temp(i,j,k)
+		else if(j .eq. je) then
+			tempeta(i,j,k) = temp(i,j,k) - temp(i,j-1,k)
+		else
+			tempeta(i,j,k) = (temp(i,j+1,k) - temp(i,j-1,k))/2.d0
+		end if    
+	end do
+	end do
+	end do	
+
 	if      (iflag_dimension .eq. iflag_2d)then
-		do k = ks1,ke1
-		do j = js1,je1
-		do i = is1,ie1
-			if (i .eq. is) then
-				tempxi(i,j,k) = temp(i+1,j,k) - temp(i,j,k)
-			else if(i .eq. ie) then
-				tempxi(i,j,k) = temp(i,j,k) - temp(i-1,j,k)
-			else
-				tempxi(i,j,k) = (temp(i+1,j,k) - temp(i-1,j,k))/2.d0
-			end if    
-		end do
-		end do
-		end do	
-
-		do k = ks1,ke1
-		do j = js1,je1
-		do i = is1,ie1
-			if (j .eq. js) then
-				tempeta(i,j,k) = temp(i,j+1,k) - temp(i,j,k)
-			else if(j .eq. je) then
-				tempeta(i,j,k) = temp(i,j,k) - temp(i,j-1,k)
-			else
-				tempeta(i,j,k) = (temp(i,j+1,k) - temp(i,j-1,k))/2.d0
-			end if    
-		end do
-		end do
-		end do	
-
 		tempzeta = 0.d0
 	else if (iflag_dimension .eq. iflag_3d)then
-
+		do k = ks1,ke1
+		do j = js1,je1
+		do i = is1,ie1
+			if     (k .eq. ks) then
+				tempeta(i,j,k) = temp(i,j,k+1) - temp(i,j,k)
+			else if(k .eq. ke) then
+				tempeta(i,j,k) = temp(i,j,k) - temp(i,j,k-1)
+			else
+				tempeta(i,j,k) = (temp(i,j,k+1) - temp(i,j,k-1))/2.d0
+			end if    
+		end do
+		end do
+		end do	
 	end if   
      
 	do k = ks1,ke1
@@ -625,79 +664,143 @@ subroutine sa_lusgs(nut,dt,sa_rhs,pri_v,dxidx,diasd,re,cfl,is,ie,js,je,ks,ke,is1
 	end if    
 	
 	!!get diag
-	k = 1
-	do j = js1-1,je1+1
-	do i = is1-1,ie1+1
-		u  = pri_v(2,i,j,k)
-		v  = pri_v(3,i,j,k)
-		w  = pri_v(4,i,j,k)
+	if (iflag_dimension .eq. iflag_2d) then
+		k = 1
+		do j = js1-1,je1+1
+		do i = is1-1,ie1+1
+			u  = pri_v(2,i,j,k)
+			v  = pri_v(3,i,j,k)
+			w  = pri_v(4,i,j,k)
 				
-		dxidx0 = dxidx(1,i,j,k)
-		dxidy0 = dxidx(2,i,j,k)
-		dxidz0 = dxidx(3,i,j,k)
-		dxidx2 = dxidx0*dxidx0 + dxidy0*dxidy0 + dxidz0*dxidz0
+			dxidx0 = dxidx(1,i,j,k)
+			dxidy0 = dxidx(2,i,j,k)
+			dxidz0 = dxidx(3,i,j,k)
+			dxidx2 = dxidx0*dxidx0 + dxidy0*dxidy0 + dxidz0*dxidz0
 
-		contrau(i,j,k) = dxidx0*u + dxidy0*v + dxidz0*w
+			contrau(i,j,k) = dxidx0*u + dxidy0*v + dxidz0*w
 				
-		dxidx0 = dxidx(4,i,j,k)
-		dxidy0 = dxidx(5,i,j,k)
-		dxidz0 = dxidx(6,i,j,k)
+			dxidx0 = dxidx(4,i,j,k)
+			dxidy0 = dxidx(5,i,j,k)
+			dxidz0 = dxidx(6,i,j,k)
 		
-		dxidx2 = dxidx2 + dxidx0*dxidx0 + dxidy0*dxidy0 + dxidz0*dxidz0
-		contrav(i,j,k) = dxidx0*u + dxidy0*v + dxidz0*w
+			dxidx2 = dxidx2 + dxidx0*dxidx0 + dxidy0*dxidy0 + dxidz0*dxidz0
+			contrav(i,j,k) = dxidx0*u + dxidy0*v + dxidz0*w
 				
-		dxidx0 = dxidx(7,i,j,k)
-		dxidy0 = dxidx(8,i,j,k)
-		dxidz0 = dxidx(9,i,j,k)
+			dxidx0 = dxidx(7,i,j,k)
+			dxidy0 = dxidx(8,i,j,k)
+			dxidz0 = dxidx(9,i,j,k)
 			
-		dxidx2 = dxidx2 + dxidx0*dxidx0 + dxidy0*dxidy0 + dxidz0*dxidz0
-		contraw(i,j,k) = dxidx0*u + dxidy0*v + dxidz0*w				
-		!!*
+			dxidx2 = dxidx2 + dxidx0*dxidx0 + dxidy0*dxidy0 + dxidz0*dxidz0
+			contraw(i,j,k) = dxidx0*u + dxidy0*v + dxidz0*w				
+			!!*
 				
-		!!viscous spectral radious
-		tm = 4.d0*dxidx2*nut(i,j,k)/re
-		diag(i,j,k) = 1.d0/dt(i,j,k)*phi + abs(contrau(i,j,k)) + abs(contrav(i,j,k)) + abs(contraw(i,j,k)) + tm - diasd(i,j,k)
-	end do
-	end do
+			!!viscous spectral radious
+			tm = 4.d0*dxidx2*nut(i,j,k)/re
+			diag(i,j,k) = 1.d0/dt(i,j,k)*phi + abs(contrau(i,j,k)) + abs(contrav(i,j,k)) + abs(contraw(i,j,k)) + tm - diasd(i,j,k)
+		end do
+		end do
+	else if (iflag_dimension .eq. iflag_3d) then
+		do k = ks1-1,ke1+1
+		do j = js1-1,je1+1
+		do i = is1-1,ie1+1
+			u  = pri_v(2,i,j,k)
+			v  = pri_v(3,i,j,k)
+			w  = pri_v(4,i,j,k)
+				
+			dxidx0 = dxidx(1,i,j,k)
+			dxidy0 = dxidx(2,i,j,k)
+			dxidz0 = dxidx(3,i,j,k)
+			dxidx2 = dxidx0*dxidx0 + dxidy0*dxidy0 + dxidz0*dxidz0
+
+			contrau(i,j,k) = dxidx0*u + dxidy0*v + dxidz0*w
+				
+			dxidx0 = dxidx(4,i,j,k)
+			dxidy0 = dxidx(5,i,j,k)
+			dxidz0 = dxidx(6,i,j,k)
+		
+			dxidx2 = dxidx2 + dxidx0*dxidx0 + dxidy0*dxidy0 + dxidz0*dxidz0
+			contrav(i,j,k) = dxidx0*u + dxidy0*v + dxidz0*w
+				
+			dxidx0 = dxidx(7,i,j,k)
+			dxidy0 = dxidx(8,i,j,k)
+			dxidz0 = dxidx(9,i,j,k)
+			
+			dxidx2 = dxidx2 + dxidx0*dxidx0 + dxidy0*dxidy0 + dxidz0*dxidz0
+			contraw(i,j,k) = dxidx0*u + dxidy0*v + dxidz0*w				
+			!!*
+				
+			!!viscous spectral radious
+			tm = 4.d0*dxidx2*nut(i,j,k)/re
+			diag(i,j,k) = 1.d0/dt(i,j,k)*phi + abs(contrau(i,j,k)) + abs(contrav(i,j,k)) + abs(contraw(i,j,k)) + tm - diasd(i,j,k)
+		end do
+		end do
+		end do
+	end if
 	!!*
 	
-	if   (iflag_dimension .eq. iflag_2d) then
-		k = 1  
+	if (iflag_dimension .eq. iflag_3d) then
 		!!forward sweep
+		do k = ks1,ke1
+		do j = js1,je1
+		do i = is1,ie1
+			tempa = 0.5d0*(contrau(i,j,k) + abs(contrau(i,j,k)))*dnut1(i-1,j  ,k  )
+			tempb = 0.5d0*(contrav(i,j,k) + abs(contrav(i,j,k)))*dnut1(i,  j-1,k  )
+			tempc = 0.5d0*(contraw(i,j,k) + abs(contraw(i,j,k)))*dnut1(i,  j  ,k-1)
+				
+			dnut1(i,j,k) = (sa_rhs(i,j,k) + (tempa + tempb + tempc))/diag(i,j,k)
+		end do
+		end do
+		end do
+		!!*
+	
+		!!backward sweep
+		do k = ke1,ks1,-1
+		do j = je1,js1,-1
+		do i = ie1,is1,-1
+			tempa = 0.5d0*(contrau(i,j,k) - abs(contrau(i,j,k)))*dnut(i+1,j  ,k  )
+			tempb = 0.5d0*(contrav(i,j,k) - abs(contrav(i,j,k)))*dnut(i,  j+1,k  )
+			tempc = 0.5d0*(contraw(i,j,k) - abs(contraw(i,j,k)))*dnut(i,  j  ,k+1)
+				
+			dnut(i,j,k) = dnut1(i,j,k) - (tempa + tempb + tempc)/diag(i,j,k)
+		end do
+		end do
+		end do
+		!!*
+	else 
+		!!forward sweep
+		k = 1
 		do j = js1,je1
 		do i = is1,ie1
 			tempa = 0.5d0*(contrau(i,j,k) + abs(contrau(i,j,k)))*dnut1(i-1,j  ,k)
 			tempb = 0.5d0*(contrav(i,j,k) + abs(contrav(i,j,k)))*dnut1(i,  j-1,k)
-				
+			
 			dnut1(i,j,k) = (sa_rhs(i,j,k) + (tempa + tempb))/diag(i,j,k)
 		end do
 		end do
 		!!*
 		
-		k = 1
 		!!backward sweep
 		do j = je1,js1,-1
 		do i = ie1,is1,-1
 			tempa = 0.5d0*(contrau(i,j,k) - abs(contrau(i,j,k)))*dnut(i+1,j  ,k)
 			tempb = 0.5d0*(contrav(i,j,k) - abs(contrav(i,j,k)))*dnut(i,  j+1,k)
-				
+					
 			dnut(i,j,k) = dnut1(i,j,k) - (tempa + tempb)/diag(i,j,k)
 		end do
 		end do
 		!!*
-		
-		!!update nu
-		!!nu(n+1) = nu(n) + dnu(n)
-		k = 1
-		do j = js1, je1
-		do i = is1, ie1
-			nut(i,j,k) = nut(i,j,k) + dnut(i,j,k)
-		end do
-		end do
-		!!*			
-	else if (iflag_dimension .eq. iflag_3d) then
-
 	end if
+		
+	!!update nu
+	!!nu(n+1) = nu(n) + dnu(n)
+	do k = ks1, ke1
+	do j = js1, je1
+	do i = is1, ie1
+		nut(i,j,k) = nut(i,j,k) + dnut(i,j,k)
+	end do
+	end do
+	end do
+	!!*			
 
 	deallocate(contrau,contrav,contraw)
 	deallocate(dnut,dnut1,diag)

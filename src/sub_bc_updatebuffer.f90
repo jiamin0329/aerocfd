@@ -357,8 +357,8 @@ subroutine UpdateBuffer
 				
 				ori = blk(m0)%bc(ksub)%ori
 				if      (ori .eq. 1)then
-					l2 = m1
-					m2 = l1
+					l2 = l1
+					m2 = m2
 					allocate(ua2(bufferLength,9,l2,m2))
 					do mm = 1,m2
 					do ll = 1,l2

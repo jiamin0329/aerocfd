@@ -127,7 +127,7 @@ subroutine secondordercentral_nd (df,f,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0
 		do k = ks0,ke0
 		do j = js0,je0
 		do i = is0,ie0
-			if (k .eq. ks) then
+			if      (k .eq. ks) then
 				df(:,i,j,k) = f(:,i,j,k+1) - f(:,i,j,k)
 			else if (k .eq. ke) then
 				df(:,i,j,k) = f(:,i,j,k) - f(:,i,j,k-1)

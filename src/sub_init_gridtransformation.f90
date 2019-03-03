@@ -106,12 +106,11 @@ subroutine gridtransformation(dxidx,inv_j,alpha,beta,gamma,x,y,z, &
 	call secondordercentral_nd(dxdxi, xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,1)
 	call secondordercentral_nd(dxdeta,xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,2)
 		
-	dxdzeta(1,:,:,:) = 0.d0
-	dxdzeta(2,:,:,:) = 0.d0
-	dxdzeta(3,:,:,:) = 1.d0
-	if (iflag_dimension .eq. iflag_3d)then
-		call secondordercentral_nd(dxdxi,  xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,1)
-		call secondordercentral_nd(dxdeta, xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,2)
+	if (iflag_dimension .eq. iflag_2d)then
+		dxdzeta(1,:,:,:) = 0.d0
+		dxdzeta(2,:,:,:) = 0.d0
+		dxdzeta(3,:,:,:) = 1.d0
+	else if (iflag_dimension .eq. iflag_3d)then
 		call secondordercentral_nd(dxdzeta,xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,3)
 	end if
 	!!*
@@ -121,15 +120,16 @@ subroutine gridtransformation(dxidx,inv_j,alpha,beta,gamma,x,y,z, &
 		write(*,*) "Writing ", debugFile
 		open (99,file = debugFile)
 !   
-		write(99,*) "variables = x,y,z,dxdxi,dydxi,dzdxi,dxdeta,dydeta,dzdeta"
+		write(99,*) "variables = x,y,z,dxdxi,dydxi,dzdxi,dxdeta,dydeta,dzdeta,dxdzeta,dydzeta,dzdzeta"
 		write(99,*) "zone i= ",ie0-is0+1, "j= ",je0-js0+1, "k= ",ke0-ks0+1,"datapacking=point"
 		
 		do k = ks0,ke0
 		do j = js0,je0
 		do i = is0,ie0
-			write(99,*) xyz   (1,i,j,k),xyz   (2,i,j,k),xyz   (3,i,j,k), &
-						dxdxi (1,i,j,k),dxdxi (2,i,j,k),dxdxi (3,i,j,k), &
-						dxdeta(1,i,j,k),dxdeta(2,i,j,k),dxdeta(3,i,j,k)
+			write(99,*) xyz    (1,i,j,k),xyz    (2,i,j,k),xyz    (3,i,j,k), &
+						dxdxi  (1,i,j,k),dxdxi  (2,i,j,k),dxdxi  (3,i,j,k), &
+						dxdeta (1,i,j,k),dxdeta (2,i,j,k),dxdeta (3,i,j,k), &
+						dxdzeta(1,i,j,k),dxdzeta(2,i,j,k),dxdzeta(3,i,j,k)
 		end do
 		end do
 		end do
@@ -143,9 +143,9 @@ subroutine gridtransformation(dxidx,inv_j,alpha,beta,gamma,x,y,z, &
 	do k = ks0,ke0
 	do j = js0,je0
 	do i = is0,ie0
-		dxdxi0 = dxdxi(1,i,j,k); dxdeta0 = dxdeta(1,i,j,k) ; dxdzeta0 = dxdzeta(1,i,j,k)
-		dydxi0 = dxdxi(2,i,j,k); dydeta0 = dxdeta(2,i,j,k) ; dydzeta0 = dxdzeta(2,i,j,k)
-		dzdxi0 = dxdxi(3,i,j,k); dzdeta0 = dxdeta(3,i,j,k) ; dzdzeta0 = dxdzeta(3,i,j,k)
+		dxdxi0 = dxdxi(1,i,j,k); dxdeta0 = dxdeta(1,i,j,k); dxdzeta0 = dxdzeta(1,i,j,k)
+		dydxi0 = dxdxi(2,i,j,k); dydeta0 = dxdeta(2,i,j,k); dydzeta0 = dxdzeta(2,i,j,k)
+		dzdxi0 = dxdxi(3,i,j,k); dzdeta0 = dxdeta(3,i,j,k); dzdzeta0 = dxdzeta(3,i,j,k)
 				
 		inv_j (i,j,k) = dxdxi0  *dydeta0 *dzdzeta0 &
 				      + dxdeta0 *dydzeta0*dzdxi0   &
@@ -210,9 +210,9 @@ subroutine gridtransformation(dxidx,inv_j,alpha,beta,gamma,x,y,z, &
 		end do
 		end do
 	else if (iflag_dimension .eq. iflag_3d)then
-		do k = ks,ke
-		do j = js,je
-		do i = is,ie
+		do k = ks0,ke0
+		do j = js0,je0
+		do i = is0,ie0
 			tempxi  (1,i,j,k) = dxdzeta(2,i,j,k)*xyz(3,i,j,k)
 			tempxi  (2,i,j,k) = dxdzeta(3,i,j,k)*xyz(1,i,j,k)
 			tempxi  (3,i,j,k) = dxdzeta(1,i,j,k)*xyz(2,i,j,k)
@@ -237,13 +237,54 @@ subroutine gridtransformation(dxidx,inv_j,alpha,beta,gamma,x,y,z, &
 		end do
 		end do
 			
-		call secondordercentral_nd(tempxixi,    tempxi,  is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,6,1)
-		call secondordercentral_nd(tempetaeta,  tempeta, is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,6,2)
-		call secondordercentral_nd(tempzetazeta,tempzeta,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,6,3)
-	
-		do k = ks,ke
-		do j = js,je
-		do i = is,ie
+		!! xi direction
+		do k = ks0,ke0
+		do j = js0,je0
+		do i = is0,ie0
+			if      (i .eq. is0) then
+				tempxixi(:,i,j,k) = tempxi(:,i+1,j,k) - tempxi(:,i,j,k)
+			else if (i .eq. ie0) then
+				tempxixi(:,i,j,k) = tempxi(:,i,j,k) - tempxi(:,i-1,j,k)
+			else 
+				tempxixi(:,i,j,k) = (tempxi(:,i+1,j,k) - tempxi(:,i-1,j,k))/2.d0
+			end if
+		end do
+		end do   
+		end do
+
+		!! eta direction
+		do k = ks0,ke0
+		do j = js0,je0
+		do i = is0,ie0
+			if      (j .eq. js0) then
+				tempetaeta(:,i,j,k) = tempeta(:,i,j+1,k) - tempeta(:,i,j,k)
+			else if (j .eq. je0) then
+				tempetaeta(:,i,j,k) = tempeta(:,i,j,k) - tempeta(:,i,j-1,k)
+			else 
+				tempetaeta(:,i,j,k) = (tempeta(:,i,j+1,k) - tempeta(:,i,j-1,k))/2.d0
+			end if
+		end do
+		end do   
+		end do
+
+		!! zeta direction
+		do k = ks0,ke0
+		do j = js0,je0
+		do i = is0,ie0
+			if      (k .eq. ks0) then
+				tempzetazeta(:,i,j,k) = tempzeta(:,i,j,k+1) - tempzeta(:,i,j,k)
+			else if (k .eq. ke0) then
+				tempzetazeta(:,i,j,k) = tempzeta(:,i,j,k) - tempzeta(:,i,j,k-1)
+			else 
+				tempzetazeta(:,i,j,k) = (tempzeta(:,i,j,k+1) - tempzeta(:,i,j,k-1))/2.d0
+			end if
+		end do
+		end do   
+		end do
+
+		do k = ks0,ke0
+		do j = js0,je0
+		do i = is0,ie0
 			dxidx(1,i,j,k) = (tempzetazeta(1,i,j,k) - tempetaeta  (1,i,j,k))/inv_j(i,j,k)
 			dxidx(2,i,j,k) = (tempzetazeta(2,i,j,k) - tempetaeta  (2,i,j,k))/inv_j(i,j,k)
 			dxidx(3,i,j,k) = (tempzetazeta(3,i,j,k) - tempetaeta  (3,i,j,k))/inv_j(i,j,k)
@@ -269,7 +310,7 @@ subroutine gridtransformation(dxidx,inv_j,alpha,beta,gamma,x,y,z, &
 		do k = ks0,ke0
 		do j = js0,je0
 		do i = is0,ie0
-			write(99,*) xyz(1,i,j,k),xyz(2,i,j,k),xyz(3,i,j,k), &
+			write(99,*) xyz  (1,i,j,k),xyz  (2,i,j,k),xyz  (3,i,j,k), &
 						dxidx(1,i,j,k),dxidx(2,i,j,k),dxidx(3,i,j,k), &
 						dxidx(4,i,j,k),dxidx(5,i,j,k),dxidx(6,i,j,k), &
 						dxidx(7,i,j,k),dxidx(8,i,j,k),dxidx(9,i,j,k)

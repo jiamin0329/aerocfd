@@ -16,9 +16,10 @@
 !! author: jiamin xu                                       !!
 !! date:   2012.11.22                                      !!
 !!=========================================================!!
-subroutine get_primitivevariables(pri_v,q,gamma,cv,is,ie,js,je,ks,ke)
+subroutine get_primitivevariables(mm,pri_v,q,gamma,cv,is,ie,js,je,ks,ke)
 	implicit none
 	
+	integer :: mm
 	integer :: is,ie,js,je,ks,ke
 	real*8  :: gamma,cv
 	real*8  :: q    (5,is:ie,js:je,ks:ke)
@@ -51,7 +52,7 @@ subroutine get_primitivevariables(pri_v,q,gamma,cv,is,ie,js,je,ks,ke)
 		pri_v(7,i,j,k) = c
 
 		if (d .lt. 0.d0) then 
-			print *, "Negative density found!!!", i,j,k
+			print *, "Negative density found!!!", mm,i,j,k
 		end if
 	end do
 	end do

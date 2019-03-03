@@ -79,16 +79,28 @@ subroutine viscous_flux(rhsv,pri_v,amu,vor,dudx,tao,dxidx,inv_j,tinf,prl,prt,gam
 	fv   = 0.d0; gv    = 0.d0; hv     = 0.d0;
 	fvxi = 0.d0; gveta = 0.d0; hvzeta = 0.d0;
 
-	k=1
-	do j = js1-1,je1+1
-	do i = is1-1,ie1+1
-		u(i,j,k) = pri_v(2,i,j,k)
-		v(i,j,k) = pri_v(3,i,j,k)
-		w(i,j,k) = pri_v(4,i,j,k)
-		t(i,j,k) = pri_v(6,i,j,k)
-	end do
-	end do
-	!!end do
+	if (iflag_dimension .eq. iflag_3d) then
+		do k = ks1-1,ke1+1
+		do j = js1-1,je1+1
+		do i = is1-1,ie1+1
+			u(i,j,k) = pri_v(2,i,j,k)
+			v(i,j,k) = pri_v(3,i,j,k)
+			w(i,j,k) = pri_v(4,i,j,k)
+			t(i,j,k) = pri_v(6,i,j,k)
+		end do
+		end do
+		end do
+	else 
+		k = 1
+		do j = js1-1,je1+1
+		do i = is1-1,ie1+1
+			u(i,j,k) = pri_v(2,i,j,k)
+			v(i,j,k) = pri_v(3,i,j,k)
+			w(i,j,k) = pri_v(4,i,j,k)
+			t(i,j,k) = pri_v(6,i,j,k)
+		end do
+		end do
+	end if
 	!!*
 	
 	!! xi direction
@@ -99,7 +111,7 @@ subroutine viscous_flux(rhsv,pri_v,amu,vor,dudx,tao,dxidx,inv_j,tinf,prl,prt,gam
 	do k = ks0,ke0
 	do j = js0,je0
 	do i = is0,ie0
-		if (i .eq. is0) then
+		if      (i .eq. is0) then
 			txi(i,j,k) = t(i+1,j,k) - t(i,j,k)
 			uxi(i,j,k) = u(i+1,j,k) - u(i,j,k)
 			vxi(i,j,k) = v(i+1,j,k) - v(i,j,k)
@@ -139,6 +151,30 @@ subroutine viscous_flux(rhsv,pri_v,amu,vor,dudx,tao,dxidx,inv_j,tinf,prl,prt,gam
  	end do
 	end do
 	end do
+
+
+	!! zeta direction
+	if (iflag_dimension .eq. iflag_3d) then
+		do k = ks0,ke0
+		do j = js0,je0
+		do i = is0,ie0
+			if     (k .eq. ks) then
+				teta(i,j,k) = t(i,j,k+1) - t(i,j,k)
+				ueta(i,j,k) = u(i,j,k+1) - u(i,j,k)
+				veta(i,j,k) = v(i,j,k+1) - v(i,j,k)
+			else if(k .eq. ke) then
+				teta(i,j,k) = t(i,j,k) - t(i,j,k-1)
+				ueta(i,j,k) = u(i,j,k) - u(i,j,k-1)
+				veta(i,j,k) = v(i,j,k) - v(i,j,k-1)
+			else 
+				teta(i,j,k) = (t(i,j,k+1) - t(i,j,k-1))/2.d0
+				ueta(i,j,k) = (u(i,j,k+1) - u(i,j,k-1))/2.d0
+				veta(i,j,k) = (v(i,j,k+1) - v(i,j,k-1))/2.d0
+			end if    
+		 end do
+		end do
+		end do
+	end if
 
 	if (isDebug .eq. 1) then
 		write(debugFile,"('result/debug_vis_ueta_'I10.10'.dat')"),mm
@@ -295,7 +331,23 @@ subroutine viscous_flux(rhsv,pri_v,amu,vor,dudx,tao,dxidx,inv_j,tinf,prl,prt,gam
 	end do
 	end do
 
-	hvzeta = 0.d0
+	if (iflag_dimension .eq. iflag_3d) then
+		do k = ks0,ke0
+		do j = js0,je0
+		do i = is0,ie0
+			if      (k .eq. ks) then
+				hvzeta(:,i,j,k) = hv(:,i,j,k+1) - hv(:,i,j,k)
+			else if (k .eq. ke) then 
+				hvzeta(:,i,j,k) = hv(:,i,j,k) - hv(:,i,j,k-1)
+			else
+				hvzeta(:,i,j,k) = (hv(:,i,j,k+1) - hv(:,i,j,k-1))/2.d0
+			end if
+		end do
+		end do
+		end do
+	else 
+		hvzeta = 0.d0
+	end if
 
 	if (isDebug .eq. 1) then
 		print *, "***", is,ie,js,je,ks,ke,is1,ie1,js1,je1,ks1,ke1

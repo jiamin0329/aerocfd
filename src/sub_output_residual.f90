@@ -27,8 +27,9 @@ subroutine residual
 	do m0 = 1,blk_loop
 		is1 = blk(m0)%is1; ie1 = blk(m0)%ie1
 		js1 = blk(m0)%js1; je1 = blk(m0)%je1
+		ks1 = blk(m0)%ks1; ke1 = blk(m0)%ke1
 			
-		k = 1
+		do k = ks1,ke1
 		do j = js1,je1
 		do i = is1,ie1
 			resi_rms(1) = resi_rms(1) + (blk(m0)%rhs(1,i,j,k)*blk(m0)%dt(i,j,k)/blk(m0)%inv_j(i,j,k))**2
@@ -38,6 +39,7 @@ subroutine residual
 			resi_rms(5) = resi_rms(5) + (blk(m0)%rhs(5,i,j,k)*blk(m0)%dt(i,j,k)/blk(m0)%inv_j(i,j,k))**2
 					
 			resi_tur(1) = resi_tur(1) + (blk(m0)%sa_rhs(i,j,k)*blk(m0)%dt(i,j,k))**2
+		end do
 		end do
 		end do
 		!!*

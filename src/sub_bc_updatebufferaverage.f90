@@ -446,9 +446,9 @@ subroutine average2
 	implicit none
 
 
-	integer:: i0,j0,k0, ind
+	integer:: i0,j0,k0,ind
 	integer:: blk_t, face
-	integer:: is_bc, ie_bc, js_bc, je_bc
+	integer:: is_bc, ie_bc, js_bc, je_bc, ks_bc, ke_bc
 
 	!!average procedure
 	do m0 = 1,blk_loop
@@ -461,11 +461,13 @@ subroutine average2
 				ie_bc     = blk(m0)%bc(ksub)%ie
 				js_bc     = blk(m0)%bc(ksub)%js
 				je_bc     = blk(m0)%bc(ksub)%je
+				ks_bc     = blk(m0)%bc(ksub)%ks
+				ke_bc     = blk(m0)%bc(ksub)%ke
 
 
 				!!i- face
 				if (face .eq. 1) then !!boundary  i- 
-					k0 = 1
+					do k0 = ks_bc,ke_bc
 					do j0 = js_bc,je_bc
 						do ind = 1,5
 							blk(m0)%q(ind,is_bc,j0,k0) = (blk(m0)%q(ind,is_bc,j0,k0) + blk(m0)%bc(ksub)%buffer(ind,is_bc,j0,k0))*0.5d0
@@ -474,12 +476,13 @@ subroutine average2
 							blk(m0)%nut(is_bc,j0,k0) = (blk(m0)%nut(is_bc,j0,k0) + blk(m0)%bc(ksub)%buffer(6,is_bc,j0,k0))*0.5d0
 						end if
 					end do
+					end do
 				end if
 				!!*
 				
 				!!i+ face
 				if (face .eq. 2) then !!boundary  i+
-					k0 = 1
+					do k0 = ks_bc,ke_bc
 					do j0 = js_bc,je_bc
 						do ind = 1,5
 							blk(m0)%q(ind,ie_bc,j0,k0) = (blk(m0)%q(ind,ie_bc,j0,k0) + blk(m0)%bc(ksub)%buffer(ind,ie_bc,j0,k0))*0.5d0
@@ -488,12 +491,13 @@ subroutine average2
 							blk(m0)%nut(ie_bc,j0,k0) = (blk(m0)%nut(ie_bc,j0,k0) + blk(m0)%bc(ksub)%buffer(6,ie_bc,j0,k0))*0.5d0
 						end if
 					end do
+					end do
 				end if
 				!!*
 				
 				!!j- face
 				if (face .eq. 3) then	!!boundary  j-
-					k0 = 1
+					do k0 = ks_bc,ke_bc
 					do i0 = is_bc,ie_bc
 						do ind = 1,5
 							blk(m0)%q(ind,i0,js_bc,k0) = (blk(m0)%q(ind,i0,js_bc,k0) + blk(m0)%bc(ksub)%buffer(ind,i0,js_bc,k0))*0.5d0
@@ -502,12 +506,13 @@ subroutine average2
 							blk(m0)%nut(i0,js_bc,k0) = (blk(m0)%nut(i0,js_bc,k0) + blk(m0)%bc(ksub)%buffer(6,i0,js_bc,k0))*0.5d0
 						end if
 					end do
+					end do
 				end if
 				!!*
 				
 				!!j+ face
 				if (face .eq. 4) then	!!boundary  j+
-					k0 = 1
+					do k0 = ks_bc,ke_bc
 					do i0 = is_bc,ie_bc
 						do ind = 1,5
 							blk(m0)%q(ind,i0,je_bc,k0) = (blk(m0)%q(ind,i0,je_bc,k0) + blk(m0)%bc(ksub)%buffer(ind,i0,je_bc,k0))*0.5d0
@@ -515,6 +520,36 @@ subroutine average2
 						if (iflag_turbulence .eq. iflag_sa) then
 							blk(m0)%nut(i0,je_bc,k0) = (blk(m0)%nut(i0,je_bc,k0) + blk(m0)%bc(ksub)%buffer(6,i0,je_bc,k0))*0.5d0
 						end if
+					end do
+					end do
+				end if
+
+				!!k- face
+				if (face .eq. 5) then	!!boundary  k-
+					do j0 = js_bc,je_bc
+					do i0 = is_bc,ie_bc
+						do ind = 1,5
+							blk(m0)%q(ind,i0,j0,ks_bc) = (blk(m0)%q(ind,i0,j0,ks_bc) + blk(m0)%bc(ksub)%buffer(ind,i0,j0,ks_bc))*0.5d0
+						end do
+						if (iflag_turbulence .eq. iflag_sa) then
+							blk(m0)%nut(i0,j0,ks_bc) = (blk(m0)%nut(i0,j0,ks_bc) + blk(m0)%bc(ksub)%buffer(6,i0,j0,ks_bc))*0.5d0
+						end if
+					end do
+					end do
+				end if
+				!!*
+				
+				!!k+ face
+				if (face .eq. 6) then	!!boundary  k+
+					do j0 = js_bc,je_bc
+					do i0 = is_bc,ie_bc
+						do ind = 1,5
+							blk(m0)%q(ind,i0,j0,ks_bc) = (blk(m0)%q(ind,i0,j0,ks_bc) + blk(m0)%bc(ksub)%buffer(ind,i0,j0,ks_bc))*0.5d0
+						end do
+						if (iflag_turbulence .eq. iflag_sa) then
+							blk(m0)%nut(i0,j0,ks_bc) = (blk(m0)%nut(i0,j0,ks_bc) + blk(m0)%bc(ksub)%buffer(6,i0,j0,ks_bc))*0.5d0
+						end if
+					end do
 					end do
 				end if
 			end if

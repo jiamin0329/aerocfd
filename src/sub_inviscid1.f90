@@ -48,7 +48,6 @@ subroutine inviscid_flux_1(rhsi,q,dxidx,inv_j, &
 	temp5 = 0.d0
 	!!*
 
-	k = 1
 	!!xi direction
 	!!reconstruction	
 	call thirdorder_weno(ur,q,is,ie,js,je,ks,ke,is1,ie1,js1,je1,ks1,ke1,1, 1) !! ritht main block
@@ -56,6 +55,7 @@ subroutine inviscid_flux_1(rhsi,q,dxidx,inv_j, &
 	!!* 
 
 	!!left and right status variables
+	do k = ks1,  ke1
 	do j = js1,  je1
 	do i = is1-1,ie1
 		ql(1,i,j,k) = ul(1,i,j,k)
@@ -71,6 +71,7 @@ subroutine inviscid_flux_1(rhsi,q,dxidx,inv_j, &
 		qr(5,i,j,k) =(ur(5,i,j,k) - 0.5d0*(ur(2,i,j,k)**2 + ur(3,i,j,k)**2 + ur(4,i,j,k)**2)/ur(1,i,j,k))*(gamma-1.d0)
 	end do
 	end do
+	end do
 	!!*
 
 	!!splitting
@@ -78,9 +79,11 @@ subroutine inviscid_flux_1(rhsi,q,dxidx,inv_j, &
 	!!*
   	
 	!!inviscid right hand side term calculation
+	do k = ks1,ke1
 	do j = js1,je1
 	do i = is1,ie1
 		rhsi(:,i,j,k) = -(flux(:,i,j,k) - flux(:,i-1,j,k))
+	end do
 	end do
 	end do
 	!!*
@@ -99,6 +102,7 @@ subroutine inviscid_flux_1(rhsi,q,dxidx,inv_j, &
 	call thirdorder_weno(ul,q,is,ie,js,je,ks,ke,is1,ie1,js1,je1,ks1,ke1,2,-1) !! left	
 	!!* 
 		
+	do k = ks1  ,ke1
 	do j = js1-1,je1
 	do i = is1  ,ie1
 		ql(1,i,j,k) = ul(1,i,j,k)
@@ -114,18 +118,69 @@ subroutine inviscid_flux_1(rhsi,q,dxidx,inv_j, &
 		qr(5,i,j,k) =(ur(5,i,j,k) - 0.5d0*(ur(2,i,j,k)**2 + ur(3,i,j,k)**2 + ur(4,i,j,k)**2)/ur(1,i,j,k))*(gamma-1.d0)
 	end do
 	end do
+	end do
 	!!*
 	
 	!!splitting
 	call roe_3d (ql,qr,flux,dxidx,inv_j,gamma,is,ie,js,je,ks,ke,is1,ie1,js1,je1,ks1,ke1,2)
 	!!*
 		
+	do k = ks1,ke1
 	do j = js1,je1
 	do i = is1,ie1
 		rhsi(:,i,j,k) = rhsi(:,i,j,k) - (flux(:,i,j,k) - flux(:,i,j-1,k))
 	end do
 	end do
+	end do
 	!!*
+
+	if (iflag_dimension .eq. iflag_3d) then
+		ql = 0.d0
+		qr = 0.d0
+		ul = 0.d0
+		ur = 0.d0
+		flux = 0.d0
+		temp = 0.d0
+		temp5 = 0.d0
+		
+		!!zeta direction
+		!!reconstruction
+		call thirdorder_weno(ur,q,is,ie,js,je,ks,ke,is1,ie1,js1,je1,ks1,ke1,3, 1) !! ritht
+		call thirdorder_weno(ul,q,is,ie,js,je,ks,ke,is1,ie1,js1,je1,ks1,ke1,3,-1) !! left	
+		!!* 
+			
+		do k = ks1-1,ke1
+		do j = js1  ,je1
+		do i = is1  ,ie1
+			ql(1,i,j,k) = ul(1,i,j,k)
+			ql(2,i,j,k) = ul(2,i,j,k)/ul(1,i,j,k)
+			ql(3,i,j,k) = ul(3,i,j,k)/ul(1,i,j,k)
+			ql(4,i,j,k) = ul(4,i,j,k)/ul(1,i,j,k)
+			ql(5,i,j,k) =(ul(5,i,j,k) - 0.5d0*(ul(2,i,j,k)**2 + ul(3,i,j,k)**2 + ul(4,i,j,k)**2)/ul(1,i,j,k))*(gamma-1.d0)
+					
+			qr(1,i,j,k) = ur(1,i,j,k)
+			qr(2,i,j,k) = ur(2,i,j,k)/ur(1,i,j,k)
+			qr(3,i,j,k) = ur(3,i,j,k)/ur(1,i,j,k)
+			qr(4,i,j,k) = ur(4,i,j,k)/ur(1,i,j,k)
+			qr(5,i,j,k) =(ur(5,i,j,k) - 0.5d0*(ur(2,i,j,k)**2 + ur(3,i,j,k)**2 + ur(4,i,j,k)**2)/ur(1,i,j,k))*(gamma-1.d0)
+		end do
+		end do
+		end do
+		!!*
+		
+		!!splitting
+		call roe_3d (ql,qr,flux,dxidx,inv_j,gamma,is,ie,js,je,ks,ke,is1,ie1,js1,je1,ks1,ke1,3)
+		!!*
+			
+		do k = ks1,ke1
+		do j = js1,je1
+		do i = is1,ie1
+			rhsi(:,i,j,k) = rhsi(:,i,j,k) - (flux(:,i,j,k) - flux(:,i,j,k-1))
+		end do
+		end do
+		end do
+		!!*
+	end if
 
 	deallocate(ql,qr,ul,ur,flux)
 	deallocate(temp,temp5)

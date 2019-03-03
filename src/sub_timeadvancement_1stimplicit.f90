@@ -106,54 +106,92 @@ subroutine implicit1st(q,dt,pri_v,rhs,rhsi,rhsv,dxidx,inv_j, &
 	dqstar = 0.d0
 	
 	!!get diag
-	!!do k = ks1-1,ke1+1
-	k = 1
-	do j = js1-1,je1+1
-	do i = is1-1,ie1+1
-		!!get primitive variables
-		d  = pri_v(1,i,j,k)
-		u  = pri_v(2,i,j,k)
-		v  = pri_v(3,i,j,k)
-		w  = pri_v(4,i,j,k)
-		p  = pri_v(5,i,j,k)
-		c  = pri_v(7,i,j,k)
+	if (iflag_dimension .eq. iflag_3d) then
+		do k = ks1-1,ke1+1
+		do j = js1-1,je1+1
+		do i = is1-1,ie1+1
+			!!get primitive variables
+			d  = pri_v(1,i,j,k)
+			u  = pri_v(2,i,j,k)
+			v  = pri_v(3,i,j,k)
+			w  = pri_v(4,i,j,k)
+			p  = pri_v(5,i,j,k)
+			c  = pri_v(7,i,j,k)
 				
-		dxidx0 = dxidx(1,i,j,k)
-		dxidy0 = dxidx(2,i,j,k)
-		dxidz0 = dxidx(3,i,j,k)
+			dxidx0 = dxidx(1,i,j,k)
+			dxidy0 = dxidx(2,i,j,k)
+			dxidz0 = dxidx(3,i,j,k)
 				
-		temp  = dxidx0**2 + dxidy0**2 + dxidz0**2
-		temp  = sqrt(temp)
-		cu    = dxidx0*u + dxidy0*v + dxidz0*w
+			temp  = dxidx0**2 + dxidy0**2 + dxidz0**2
+			temp  = sqrt(temp)
+			cu    = dxidx0*u + dxidy0*v + dxidz0*w
 				
-		ra(i,j,k) = abs(cu) + abs(c*temp)
-		!!*
+			ra(i,j,k) = abs(cu) + abs(c*temp)
+			!!*
 
-		dxidx0 = dxidx(4,i,j,k)
-		dxidy0 = dxidx(5,i,j,k)
-		dxidz0 = dxidx(6,i,j,k)
+			dxidx0 = dxidx(4,i,j,k)
+			dxidy0 = dxidx(5,i,j,k)
+			dxidz0 = dxidx(6,i,j,k)
 				
-		temp  = dxidx0**2 + dxidy0**2 + dxidz0**2
-		temp  = sqrt(temp)
-		cu    = dxidx0*u + dxidy0*v + dxidz0*w
+			temp  = dxidx0**2 + dxidy0**2 + dxidz0**2
+			temp  = sqrt(temp)
+			cu    = dxidx0*u + dxidy0*v + dxidz0*w
 				
-		rb(i,j,k) = abs(cu) + abs(c*temp)
-		!!*
+			rb(i,j,k) = abs(cu) + abs(c*temp)
+			!!*
 
-		dxidx0 = dxidx(7,i,j,k)
-		dxidy0 = dxidx(8,i,j,k)
-		dxidz0 = dxidx(9,i,j,k)
+			dxidx0 = dxidx(7,i,j,k)
+			dxidy0 = dxidx(8,i,j,k)
+			dxidz0 = dxidx(9,i,j,k)
 				
-		temp  = dxidx0**2 + dxidy0**2 + dxidz0**2
-		temp  = sqrt(temp)
-		cu    = dxidx0*u + dxidy0*v + dxidz0*w
+			temp  = dxidx0**2 + dxidy0**2 + dxidz0**2
+			temp  = sqrt(temp)
+			cu    = dxidx0*u + dxidy0*v + dxidz0*w
 				
-		rc(i,j,k) = abs(cu) + abs(c*temp)		
-		!!*
-		diag(i,j,k) = phi*1.d0/dt(i,j,k) + ra(i,j,k) + rb(i,j,k) + rc(i,j,k)
-	end do
-	end do
-    !!end do
+			rc(i,j,k) = abs(cu) + abs(c*temp)		
+			!!*
+			diag(i,j,k) = phi*1.d0/dt(i,j,k) + ra(i,j,k) + rb(i,j,k) + rc(i,j,k)
+		end do
+		end do
+		end do
+	else if (iflag_dimension .eq. iflag_2d) then
+		k = 1
+		do j = js1-1,je1+1
+		do i = is1-1,ie1+1
+			!!get primitive variables
+			d  = pri_v(1,i,j,k)
+			u  = pri_v(2,i,j,k)
+			v  = pri_v(3,i,j,k)
+			w  = pri_v(4,i,j,k)
+			p  = pri_v(5,i,j,k)
+			c  = pri_v(7,i,j,k)
+					
+			dxidx0 = dxidx(1,i,j,k)
+			dxidy0 = dxidx(2,i,j,k)
+			dxidz0 = dxidx(3,i,j,k)
+					
+			temp  = dxidx0**2 + dxidy0**2 + dxidz0**2
+			temp  = sqrt(temp)
+			cu    = dxidx0*u + dxidy0*v + dxidz0*w
+					
+			ra(i,j,k) = abs(cu) + abs(c*temp)
+			!!*
+	
+			dxidx0 = dxidx(4,i,j,k)
+			dxidy0 = dxidx(5,i,j,k)
+			dxidz0 = dxidx(6,i,j,k)
+					
+			temp  = dxidx0**2 + dxidy0**2 + dxidz0**2
+			temp  = sqrt(temp)
+			cu    = dxidx0*u + dxidy0*v + dxidz0*w
+					
+			rb(i,j,k) = abs(cu) + abs(c*temp)	
+			!!*
+			diag(i,j,k) = phi*1.d0/dt(i,j,k) + ra(i,j,k) + rb(i,j,k)
+		end do
+		end do
+		
+	end if
 	!!*
 
 	if (isDebug .eq. 1) then
@@ -171,69 +209,163 @@ subroutine implicit1st(q,dt,pri_v,rhs,rhsi,rhsv,dxidx,inv_j, &
 		close(99)
 	end if
 	
-	k = 1  
-	!!forward sweep
-	do j = js1,je1
-	do i = is1,ie1
-		!!a+(i-1,j,k)
-		dxidx0 = dxidx(1,i-1,j,k)
-		dxidy0 = dxidx(2,i-1,j,k)
-		dxidz0 = dxidx(3,i-1,j,k)
+	
+	if (iflag_dimension .eq. iflag_2d) then
+		!!forward sweep
+		do j = js1,je1
+		do i = is1,ie1
+			!!a+(i-1,j,k)
+			dxidx0 = dxidx(1,i-1,j,k)
+			dxidy0 = dxidx(2,i-1,j,k)
+			dxidz0 = dxidx(3,i-1,j,k)
 				
-		qq1 = q(1,i-1,j,k)
-		qq2 = q(2,i-1,j,k)
-		qq3 = q(3,i-1,j,k)
-		qq4 = q(4,i-1,j,k)
-		qq5 = q(5,i-1,j,k)
+			qq1 = q(1,i-1,j,k)
+			qq2 = q(2,i-1,j,k)
+			qq3 = q(3,i-1,j,k)
+			qq4 = q(4,i-1,j,k)
+			qq5 = q(5,i-1,j,k)
 				
-		call calc_jm (jm_ap,qq1,qq2,qq3,qq4,qq5,dxidx0,dxidy0,dxidz0,gamma)
+			call calc_jm (jm_ap,qq1,qq2,qq3,qq4,qq5,dxidx0,dxidy0,dxidz0,gamma)
 				
-		jm_ap(1,1) = jm_ap(1,1) + ra(i-1,j,k)
-		jm_ap(2,2) = jm_ap(2,2) + ra(i-1,j,k)
-		jm_ap(3,3) = jm_ap(3,3) + ra(i-1,j,k)
-		jm_ap(4,4) = jm_ap(4,4) + ra(i-1,j,k)
-		jm_ap(5,5) = jm_ap(5,5) + ra(i-1,j,k)
+			jm_ap(1,1) = jm_ap(1,1) + ra(i-1,j,k)
+			jm_ap(2,2) = jm_ap(2,2) + ra(i-1,j,k)
+			jm_ap(3,3) = jm_ap(3,3) + ra(i-1,j,k)
+			jm_ap(4,4) = jm_ap(4,4) + ra(i-1,j,k)
+			jm_ap(5,5) = jm_ap(5,5) + ra(i-1,j,k)
 				
-		jm_ap = 0.5d0*jm_ap*inv_j(i-1,j,k)
+			jm_ap = 0.5d0*jm_ap*inv_j(i-1,j,k)
 
-		!!b+(i,j-1,k)
-		dxidx0 = dxidx(4,i,j-1,k)
-		dxidy0 = dxidx(5,i,j-1,k)
-		dxidz0 = dxidx(6,i,j-1,k)
+			!!b+(i,j-1,k)
+			dxidx0 = dxidx(4,i,j-1,k)
+			dxidy0 = dxidx(5,i,j-1,k)
+			dxidz0 = dxidx(6,i,j-1,k)
 				
-		qq1 = q(1,i,j-1,k)
-		qq2 = q(2,i,j-1,k)
-		qq3 = q(3,i,j-1,k)
-		qq4 = q(4,i,j-1,k)
-		qq5 = q(5,i,j-1,k)
+			qq1 = q(1,i,j-1,k)
+			qq2 = q(2,i,j-1,k)
+			qq3 = q(3,i,j-1,k)
+			qq4 = q(4,i,j-1,k)
+			qq5 = q(5,i,j-1,k)
 				
-		call calc_jm (jm_bp,qq1,qq2,qq3,qq4,qq5,dxidx0,dxidy0,dxidz0,gamma)				
+			call calc_jm (jm_bp,qq1,qq2,qq3,qq4,qq5,dxidx0,dxidy0,dxidz0,gamma)				
 				
-		jm_bp(1,1) = jm_bp(1,1) + rb(i,j-1,k)
-		jm_bp(2,2) = jm_bp(2,2) + rb(i,j-1,k)
-		jm_bp(3,3) = jm_bp(3,3) + rb(i,j-1,k)
-		jm_bp(4,4) = jm_bp(4,4) + rb(i,j-1,k)
-		jm_bp(5,5) = jm_bp(5,5) + rb(i,j-1,k)
+			jm_bp(1,1) = jm_bp(1,1) + rb(i,j-1,k)
+			jm_bp(2,2) = jm_bp(2,2) + rb(i,j-1,k)
+			jm_bp(3,3) = jm_bp(3,3) + rb(i,j-1,k)
+			jm_bp(4,4) = jm_bp(4,4) + rb(i,j-1,k)
+			jm_bp(5,5) = jm_bp(5,5) + rb(i,j-1,k)
 				
-		jm_bp = 0.5d0*jm_bp*inv_j(i,j-1,k)
+			jm_bp = 0.5d0*jm_bp*inv_j(i,j-1,k)
 
-		do n = 1,5
-			tempa = jm_ap(n,1)*dqstar(1,i-1,j,k) &
-				  + jm_ap(n,2)*dqstar(2,i-1,j,k) &
-				  + jm_ap(n,3)*dqstar(3,i-1,j,k) &
-				  + jm_ap(n,4)*dqstar(4,i-1,j,k) &
-				  + jm_ap(n,5)*dqstar(5,i-1,j,k)  
+			do n = 1,5
+				tempa = jm_ap(n,1)*dqstar(1,i-1,j,k) &
+				  	  + jm_ap(n,2)*dqstar(2,i-1,j,k) &
+				  	  + jm_ap(n,3)*dqstar(3,i-1,j,k) &
+				  	  + jm_ap(n,4)*dqstar(4,i-1,j,k) &
+				      + jm_ap(n,5)*dqstar(5,i-1,j,k)  
 						      
-			tempb = jm_bp(n,1)*dqstar(1,i,j-1,k) &
-				  + jm_bp(n,2)*dqstar(2,i,j-1,k) &
-				  + jm_bp(n,3)*dqstar(3,i,j-1,k) &
-				  + jm_bp(n,4)*dqstar(4,i,j-1,k) &
-				  + jm_bp(n,5)*dqstar(5,i,j-1,k)  
+				tempb = jm_bp(n,1)*dqstar(1,i,j-1,k) &
+				  	  + jm_bp(n,2)*dqstar(2,i,j-1,k) &
+				  	  + jm_bp(n,3)*dqstar(3,i,j-1,k) &
+				 	  + jm_bp(n,4)*dqstar(4,i,j-1,k) &
+				  	  + jm_bp(n,5)*dqstar(5,i,j-1,k)  
 				  
-			dqstar(n,i,j,k) = (rhs(n,i,j,k) + (tempa + tempb))/diag(i,j,k)/inv_j(i,j,k)
+				dqstar(n,i,j,k) = (rhs(n,i,j,k) + (tempa + tempb))/diag(i,j,k)/inv_j(i,j,k)
+			end do
 		end do
-	end do
-	end do
+		end do
+	else 
+		!!forward sweep
+		do k = ks1,ke1
+		do j = js1,je1
+		do i = is1,ie1
+			!!a+(i-1,j,k)
+			dxidx0 = dxidx(1,i-1,j,k)
+			dxidy0 = dxidx(2,i-1,j,k)
+			dxidz0 = dxidx(3,i-1,j,k)
+					
+			qq1 = q(1,i-1,j,k)
+			qq2 = q(2,i-1,j,k)
+			qq3 = q(3,i-1,j,k)
+			qq4 = q(4,i-1,j,k)
+			qq5 = q(5,i-1,j,k)
+					
+			call calc_jm (jm_ap,qq1,qq2,qq3,qq4,qq5,dxidx0,dxidy0,dxidz0,gamma)
+					
+			jm_ap(1,1) = jm_ap(1,1) + ra(i-1,j,k)
+			jm_ap(2,2) = jm_ap(2,2) + ra(i-1,j,k)
+			jm_ap(3,3) = jm_ap(3,3) + ra(i-1,j,k)
+			jm_ap(4,4) = jm_ap(4,4) + ra(i-1,j,k)
+			jm_ap(5,5) = jm_ap(5,5) + ra(i-1,j,k)
+					
+			jm_ap = 0.5d0*jm_ap*inv_j(i-1,j,k)
+	
+			!!b+(i,j-1,k)
+			dxidx0 = dxidx(4,i,j-1,k)
+			dxidy0 = dxidx(5,i,j-1,k)
+			dxidz0 = dxidx(6,i,j-1,k)
+					
+			qq1 = q(1,i,j-1,k)
+			qq2 = q(2,i,j-1,k)
+			qq3 = q(3,i,j-1,k)
+			qq4 = q(4,i,j-1,k)
+			qq5 = q(5,i,j-1,k)
+					
+			call calc_jm (jm_bp,qq1,qq2,qq3,qq4,qq5,dxidx0,dxidy0,dxidz0,gamma)				
+					
+			jm_bp(1,1) = jm_bp(1,1) + rb(i,j-1,k)
+			jm_bp(2,2) = jm_bp(2,2) + rb(i,j-1,k)
+			jm_bp(3,3) = jm_bp(3,3) + rb(i,j-1,k)
+			jm_bp(4,4) = jm_bp(4,4) + rb(i,j-1,k)
+			jm_bp(5,5) = jm_bp(5,5) + rb(i,j-1,k)
+					
+			jm_bp = 0.5d0*jm_bp*inv_j(i,j-1,k)
+
+			!!c+(i,j,k-1)
+			dxidx0 = dxidx(7,i,j,k-1)
+			dxidy0 = dxidx(8,i,j,k-1)
+			dxidz0 = dxidx(9,i,j,k-1)
+					
+			qq1 = q(1,i,j,k-1)
+			qq2 = q(2,i,j,k-1)
+			qq3 = q(3,i,j,k-1)
+			qq4 = q(4,i,j,k-1)
+			qq5 = q(5,i,j,k-1)
+					
+			call calc_jm (jm_cp,qq1,qq2,qq3,qq4,qq5,dxidx0,dxidy0,dxidz0,gamma)				
+					
+			jm_cp(1,1) = jm_cp(1,1) + rc(i,j,k-1)
+			jm_cp(2,2) = jm_cp(2,2) + rc(i,j,k-1)
+			jm_cp(3,3) = jm_cp(3,3) + rc(i,j,k-1)
+			jm_cp(4,4) = jm_cp(4,4) + rc(i,j,k-1)
+			jm_cp(5,5) = jm_cp(5,5) + rc(i,j,k-1)
+					
+			jm_cp = 0.5d0*jm_cp*inv_j(i,j,k-1)
+	
+			do n = 1,5
+				tempa = jm_ap(n,1)*dqstar(1,i-1,j,k) &
+					  + jm_ap(n,2)*dqstar(2,i-1,j,k) &
+					  + jm_ap(n,3)*dqstar(3,i-1,j,k) &
+					  + jm_ap(n,4)*dqstar(4,i-1,j,k) &
+					  + jm_ap(n,5)*dqstar(5,i-1,j,k)  
+								  
+				tempb = jm_bp(n,1)*dqstar(1,i,j-1,k) &
+					  + jm_bp(n,2)*dqstar(2,i,j-1,k) &
+					  + jm_bp(n,3)*dqstar(3,i,j-1,k) &
+					  + jm_bp(n,4)*dqstar(4,i,j-1,k) &
+					  + jm_bp(n,5)*dqstar(5,i,j-1,k)  
+					  
+				tempc = jm_cp(n,1)*dqstar(1,i,j,k-1) &
+					  + jm_cp(n,2)*dqstar(2,i,j,k-1) &
+					  + jm_cp(n,3)*dqstar(3,i,j,k-1) &
+					  + jm_cp(n,4)*dqstar(4,i,j,k-1) &
+					  + jm_cp(n,5)*dqstar(5,i,j,k-1)  
+					  
+				dqstar(n,i,j,k) = (rhs(n,i,j,k) + (tempa + tempb + tempc))/diag(i,j,k)/inv_j(i,j,k)
+			end do
+		end do
+		end do
+		end do
+	end if
 
 	if (isDebug .eq. 1) then
 		open (99,file = 'result/debug_dqstar.dat')
@@ -252,70 +384,165 @@ subroutine implicit1st(q,dt,pri_v,rhs,rhsi,rhsv,dxidx,inv_j, &
 	end if
 	!!*
 	
-	k = 1
-	!!backward sweep
-	do j = je1,js1,-1
-	do i = ie1,is1,-1
-		!!a-(i+1,j,k)
-		dxidx0 = dxidx(1,i+1,j,k)
-		dxidy0 = dxidx(2,i+1,j,k)
-		dxidz0 = dxidx(3,i+1,j,k)
+	if (iflag_dimension .eq. iflag_2d) then
+		!!backward sweep
+		k = 1
+		do j = je1,js1,-1
+		do i = ie1,is1,-1
+			!!a-(i+1,j,k)
+			dxidx0 = dxidx(1,i+1,j,k)
+			dxidy0 = dxidx(2,i+1,j,k)
+			dxidz0 = dxidx(3,i+1,j,k)
 
-		qq1 = q(1,i+1,j,k)
-		qq2 = q(2,i+1,j,k)
-		qq3 = q(3,i+1,j,k)
-		qq4 = q(4,i+1,j,k)
-		qq5 = q(5,i+1,j,k)
+			qq1 = q(1,i+1,j,k)
+			qq2 = q(2,i+1,j,k)
+			qq3 = q(3,i+1,j,k)
+			qq4 = q(4,i+1,j,k)
+			qq5 = q(5,i+1,j,k)
 				
-		call calc_jm (jm_am,qq1,qq2,qq3,qq4,qq5,dxidx0,dxidy0,dxidz0,gamma)				
+			call calc_jm (jm_am,qq1,qq2,qq3,qq4,qq5,dxidx0,dxidy0,dxidz0,gamma)				
 				
-		jm_am(1,1) = jm_am(1,1) - ra(i+1,j,k)
-		jm_am(2,2) = jm_am(2,2) - ra(i+1,j,k)
-		jm_am(3,3) = jm_am(3,3) - ra(i+1,j,k)
-		jm_am(4,4) = jm_am(4,4) - ra(i+1,j,k)
-		jm_am(5,5) = jm_am(5,5) - ra(i+1,j,k)
+			jm_am(1,1) = jm_am(1,1) - ra(i+1,j,k)
+			jm_am(2,2) = jm_am(2,2) - ra(i+1,j,k)
+			jm_am(3,3) = jm_am(3,3) - ra(i+1,j,k)
+			jm_am(4,4) = jm_am(4,4) - ra(i+1,j,k)
+			jm_am(5,5) = jm_am(5,5) - ra(i+1,j,k)
 				
-		jm_am = 0.5d0*jm_am*inv_j(i+1,j,k)
+			jm_am = 0.5d0*jm_am*inv_j(i+1,j,k)
 
-		!!b+(i,j+1,k)
-		dxidx0 = dxidx(4,i,j+1,k)
-		dxidy0 = dxidx(5,i,j+1,k)
-		dxidz0 = dxidx(6,i,j+1,k)
+			!!b+(i,j+1,k)
+			dxidx0 = dxidx(4,i,j+1,k)
+			dxidy0 = dxidx(5,i,j+1,k)
+			dxidz0 = dxidx(6,i,j+1,k)
 				
-		qq1 = q(1,i,j+1,k)
-		qq2 = q(2,i,j+1,k)
-		qq3 = q(3,i,j+1,k)
-		qq4 = q(4,i,j+1,k)
-		qq5 = q(5,i,j+1,k)
+			qq1 = q(1,i,j+1,k)
+			qq2 = q(2,i,j+1,k)
+			qq3 = q(3,i,j+1,k)
+			qq4 = q(4,i,j+1,k)
+			qq5 = q(5,i,j+1,k)
 				
-		call calc_jm (jm_bm,qq1,qq2,qq3,qq4,qq5,dxidx0,dxidy0,dxidz0,gamma)
+			call calc_jm (jm_bm,qq1,qq2,qq3,qq4,qq5,dxidx0,dxidy0,dxidz0,gamma)
 				
-		jm_bm(1,1) = jm_bm(1,1) - rb(i,j+1,k)
-		jm_bm(2,2) = jm_bm(2,2) - rb(i,j+1,k)
-		jm_bm(3,3) = jm_bm(3,3) - rb(i,j+1,k)
-		jm_bm(4,4) = jm_bm(4,4) - rb(i,j+1,k)
-		jm_bm(5,5) = jm_bm(5,5) - rb(i,j+1,k)
+			jm_bm(1,1) = jm_bm(1,1) - rb(i,j+1,k)
+			jm_bm(2,2) = jm_bm(2,2) - rb(i,j+1,k)
+			jm_bm(3,3) = jm_bm(3,3) - rb(i,j+1,k)
+			jm_bm(4,4) = jm_bm(4,4) - rb(i,j+1,k)
+			jm_bm(5,5) = jm_bm(5,5) - rb(i,j+1,k)
 				
-		jm_bm = 0.5d0*jm_bm*inv_j(i,j+1,k)				
+			jm_bm = 0.5d0*jm_bm*inv_j(i,j+1,k)				
 				
-		do n = 1, 5
-			tempa = jm_am(n,1)*dq(1,i+1,j,k) &
-				  + jm_am(n,2)*dq(2,i+1,j,k) &
-				  + jm_am(n,3)*dq(3,i+1,j,k) &
-				  + jm_am(n,4)*dq(4,i+1,j,k) &
-				  + jm_am(n,5)*dq(5,i+1,j,k)
+			do n = 1, 5
+				tempa = jm_am(n,1)*dq(1,i+1,j,k) &
+				  	  + jm_am(n,2)*dq(2,i+1,j,k) &
+				  	  + jm_am(n,3)*dq(3,i+1,j,k) &
+				  	  + jm_am(n,4)*dq(4,i+1,j,k) &
+				  	  + jm_am(n,5)*dq(5,i+1,j,k)
 						    
-			tempb = jm_bm(n,1)*dq(1,i,j+1,k) &
-				  + jm_bm(n,2)*dq(2,i,j+1,k) &
-				  + jm_bm(n,3)*dq(3,i,j+1,k) &
-				  + jm_bm(n,4)*dq(4,i,j+1,k) &
-				  + jm_bm(n,5)*dq(5,i,j+1,k)
+				tempb = jm_bm(n,1)*dq(1,i,j+1,k) &
+				  	  + jm_bm(n,2)*dq(2,i,j+1,k) &
+				      + jm_bm(n,3)*dq(3,i,j+1,k) &
+				      + jm_bm(n,4)*dq(4,i,j+1,k) &
+				  	  + jm_bm(n,5)*dq(5,i,j+1,k)
                         
-			dq(n,i,j,k) = dqstar(n,i,j,k) - (tempa + tempb)/inv_j(i,j,k)/diag(i,j,k)
-			!!print *,  i,j,k,dqstar(n,i,j,k), tempa, tempb ,inv_j(i,j,k), diag(i,j,k)
+				dq(n,i,j,k) = dqstar(n,i,j,k) - (tempa + tempb)/inv_j(i,j,k)/diag(i,j,k)
+				!!print *,  i,j,k,dqstar(n,i,j,k), tempa, tempb ,inv_j(i,j,k), diag(i,j,k)
+			end do
 		end do
-	end do
-	end do
+		end do
+	else 
+		!!backward sweep
+		do k = ke1,ks1,-1
+		do j = je1,js1,-1
+		do i = ie1,is1,-1
+			!!a-(i+1,j,k)
+			dxidx0 = dxidx(1,i+1,j,k)
+			dxidy0 = dxidx(2,i+1,j,k)
+			dxidz0 = dxidx(3,i+1,j,k)
+	
+			qq1 = q(1,i+1,j,k)
+			qq2 = q(2,i+1,j,k)
+			qq3 = q(3,i+1,j,k)
+			qq4 = q(4,i+1,j,k)
+			qq5 = q(5,i+1,j,k)
+					
+			call calc_jm (jm_am,qq1,qq2,qq3,qq4,qq5,dxidx0,dxidy0,dxidz0,gamma)				
+					
+			jm_am(1,1) = jm_am(1,1) - ra(i+1,j,k)
+			jm_am(2,2) = jm_am(2,2) - ra(i+1,j,k)
+			jm_am(3,3) = jm_am(3,3) - ra(i+1,j,k)
+			jm_am(4,4) = jm_am(4,4) - ra(i+1,j,k)
+			jm_am(5,5) = jm_am(5,5) - ra(i+1,j,k)
+					
+			jm_am = 0.5d0*jm_am*inv_j(i+1,j,k)
+	
+			!!b+(i,j+1,k)
+			dxidx0 = dxidx(4,i,j+1,k)
+			dxidy0 = dxidx(5,i,j+1,k)
+			dxidz0 = dxidx(6,i,j+1,k)
+					
+			qq1 = q(1,i,j+1,k)
+			qq2 = q(2,i,j+1,k)
+			qq3 = q(3,i,j+1,k)
+			qq4 = q(4,i,j+1,k)
+			qq5 = q(5,i,j+1,k)
+					
+			call calc_jm (jm_bm,qq1,qq2,qq3,qq4,qq5,dxidx0,dxidy0,dxidz0,gamma)
+					
+			jm_bm(1,1) = jm_bm(1,1) - rb(i,j+1,k)
+			jm_bm(2,2) = jm_bm(2,2) - rb(i,j+1,k)
+			jm_bm(3,3) = jm_bm(3,3) - rb(i,j+1,k)
+			jm_bm(4,4) = jm_bm(4,4) - rb(i,j+1,k)
+			jm_bm(5,5) = jm_bm(5,5) - rb(i,j+1,k)
+					
+			jm_bm = 0.5d0*jm_bm*inv_j(i,j+1,k)	
+			
+			!!c+(i,j,k+1)
+			dxidx0 = dxidx(7,i,j,k+1)
+			dxidy0 = dxidx(8,i,j,k+1)
+			dxidz0 = dxidx(9,i,j,k+1)
+					
+			qq1 = q(1,i,j,k+1)
+			qq2 = q(2,i,j,k+1)
+			qq3 = q(3,i,j,k+1)
+			qq4 = q(4,i,j,k+1)
+			qq5 = q(5,i,j,k+1)
+					
+			call calc_jm (jm_cm,qq1,qq2,qq3,qq4,qq5,dxidx0,dxidy0,dxidz0,gamma)
+					
+			jm_cm(1,1) = jm_cm(1,1) - rc(i,j,k+1)
+			jm_cm(2,2) = jm_cm(2,2) - rc(i,j,k+1)
+			jm_cm(3,3) = jm_cm(3,3) - rc(i,j,k+1)
+			jm_cm(4,4) = jm_cm(4,4) - rc(i,j,k+1)
+			jm_cm(5,5) = jm_cm(5,5) - rc(i,j,k+1)
+					
+			jm_cm = 0.5d0*jm_cm*inv_j(i,j,k+1)
+					
+			do n = 1, 5
+				tempa = jm_am(n,1)*dq(1,i+1,j,k) &
+					  + jm_am(n,2)*dq(2,i+1,j,k) &
+					  + jm_am(n,3)*dq(3,i+1,j,k) &
+					  + jm_am(n,4)*dq(4,i+1,j,k) &
+					  + jm_am(n,5)*dq(5,i+1,j,k)
+								
+				tempb = jm_bm(n,1)*dq(1,i,j+1,k) &
+					  + jm_bm(n,2)*dq(2,i,j+1,k) &
+					  + jm_bm(n,3)*dq(3,i,j+1,k) &
+					  + jm_bm(n,4)*dq(4,i,j+1,k) &
+					  + jm_bm(n,5)*dq(5,i,j+1,k)
+
+				tempc = jm_cm(n,1)*dq(1,i,j,k+1) &
+					  + jm_cm(n,2)*dq(2,i,j,k+1) &
+					  + jm_cm(n,3)*dq(3,i,j,k+1) &
+					  + jm_cm(n,4)*dq(4,i,j,k+1) &
+					  + jm_cm(n,5)*dq(5,i,j,k+1)
+							
+				dq(n,i,j,k) = dqstar(n,i,j,k) - (tempa + tempb + tempc)/inv_j(i,j,k)/diag(i,j,k)
+				!!print *,  i,j,k,dqstar(n,i,j,k), tempa, tempb ,inv_j(i,j,k), diag(i,j,k)
+			end do
+		end do
+		end do
+		end do
+	end if
 	!!*
 	
 	if (isDebug .eq. 1) then
@@ -337,10 +564,11 @@ subroutine implicit1st(q,dt,pri_v,rhs,rhsi,rhsv,dxidx,inv_j, &
 
 	!!update q
 	!!q(n+1) = q(n) + dq(n)
-	k = 1
+	do k = ks1, ke1
 	do j = js1, je1
 	do i = is1, ie1
 		q(:,i,j,k) = q(:,i,j,k) + dq(:,i,j,k)
+	end do
 	end do
 	end do
 	!!*    
