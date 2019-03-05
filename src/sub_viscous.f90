@@ -111,11 +111,11 @@ subroutine viscous_flux(rhsv,pri_v,amu,vor,dudx,tao,dxidx,inv_j,tinf,prl,prt,gam
 	do k = ks0,ke0
 	do j = js0,je0
 	do i = is0,ie0
-		if      (i .eq. is0) then
+		if      (i .eq. is) then
 			txi(i,j,k) = t(i+1,j,k) - t(i,j,k)
 			uxi(i,j,k) = u(i+1,j,k) - u(i,j,k)
 			vxi(i,j,k) = v(i+1,j,k) - v(i,j,k)
-		else if (i .eq. ie0) then
+		else if (i .eq. ie) then
 			txi(i,j,k) = t(i,j,k) - t(i-1,j,k)
 			uxi(i,j,k) = u(i,j,k) - u(i-1,j,k)
 			vxi(i,j,k) = v(i,j,k) - v(i-1,j,k)
@@ -135,7 +135,7 @@ subroutine viscous_flux(rhsv,pri_v,amu,vor,dudx,tao,dxidx,inv_j,tinf,prl,prt,gam
 	do k = ks0,ke0
 	do j = js0,je0
 	do i = is0,ie0
-		if (j .eq. js) then
+		if     (j .eq. js) then
 			teta(i,j,k) = t(i,j+1,k) - t(i,j,k)
 			ueta(i,j,k) = u(i,j+1,k) - u(i,j,k)
 			veta(i,j,k) = v(i,j+1,k) - v(i,j,k)
@@ -305,9 +305,9 @@ subroutine viscous_flux(rhsv,pri_v,amu,vor,dudx,tao,dxidx,inv_j,tinf,prl,prt,gam
 	do j = js0,je0
 	do i = is0,ie0
 	do n = 1, 5
-		if (i .eq. is) then
+		if      (i .eq. is0) then
 			fvxi(n,i,j,k) = fv(n,i+1,j,k) - fv(n,i,j,k)
-		else if (i .eq. ie) then
+		else if (i .eq. ie0) then
 			fvxi(n,i,j,k) = fv(n,i,j,k) - fv(n,i-1,j,k)
 		else
 			fvxi(n,i,j,k) = (fv(n,i+1,j,k) - fv(n,i-1,j,k))/2.d0
@@ -320,9 +320,9 @@ subroutine viscous_flux(rhsv,pri_v,amu,vor,dudx,tao,dxidx,inv_j,tinf,prl,prt,gam
 	do k = ks0,ke0
 	do j = js0,je0
 	do i = is0,ie0
-		if (j .eq. js) then
+		if      (j .eq. js0) then
 			gveta(:,i,j,k) = gv(:,i,j+1,k) - gv(:,i,j,k)
-		else if (j .eq. je) then 
+		else if (j .eq. je0) then 
 			gveta(:,i,j,k) = gv(:,i,j,k) - gv(:,i,j-1,k)
 		else
 			gveta(:,i,j,k) = (gv(:,i,j+1,k) - gv(:,i,j-1,k))/2.d0
@@ -335,9 +335,9 @@ subroutine viscous_flux(rhsv,pri_v,amu,vor,dudx,tao,dxidx,inv_j,tinf,prl,prt,gam
 		do k = ks0,ke0
 		do j = js0,je0
 		do i = is0,ie0
-			if      (k .eq. ks) then
+			if      (k .eq. ks0) then
 				hvzeta(:,i,j,k) = hv(:,i,j,k+1) - hv(:,i,j,k)
-			else if (k .eq. ke) then 
+			else if (k .eq. ke0) then 
 				hvzeta(:,i,j,k) = hv(:,i,j,k) - hv(:,i,j,k-1)
 			else
 				hvzeta(:,i,j,k) = (hv(:,i,j,k+1) - hv(:,i,j,k-1))/2.d0

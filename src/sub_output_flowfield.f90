@@ -66,7 +66,7 @@ subroutine flowfield_output
 			jdim = je-js+1
 			kdim = ke-ks+1
 			
-			write(99,*) "variables = x,y,z,d,u,v,w,p"
+			write(99,*) "variables = x,y,z,d,u,v,w,p,nut"
 			write(99,*) "zone i= ",idim, "j= ",jdim, "k= ",kdim,"datapacking=point"
 			
 			do k = ks,ke
@@ -77,7 +77,8 @@ subroutine flowfield_output
 							blk(m0)%pri_v(2,i,j,k),                             &
 							blk(m0)%pri_v(3,i,j,k),                             &
 							blk(m0)%pri_v(4,i,j,k),                             &
-							blk(m0)%pri_v(5,i,j,k)
+							blk(m0)%pri_v(5,i,j,k),                             &
+							blk(m0)%nut  (  i,j,k)
 			end do
 			end do
 			end do

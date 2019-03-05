@@ -199,6 +199,7 @@ subroutine sa_rhs1(sa_rhs,nut,pri_v,dxidx,  &
 			    	+ 0.5d0*(ww - abs(ww))*(nutp - nutc))
 		!!*
 		end if
+
 		sa_rhs(i,j,k) = uxi+veta+wzeta
 	end do
 	end do
@@ -291,9 +292,9 @@ subroutine sa_rhs2(sa_rhs,nut,amu,pri_v,dxidx,inv_j,alpha,beta,gamma,re, &
 	do k = ks1,ke1
 	do j = js1,je1
 	do i = is1,ie1
-		if (j .eq. js) then
+		if     (i .eq. is) then
 			dnutdxi(i,j,k) = nut(i+1,j,k) - nut(i,j,k)
-		else if(j .eq. je) then
+		else if(i .eq. ie) then
 			dnutdxi(i,j,k) = nut(i,j,k) - nut(i-1,j,k)
 		else
 			dnutdxi(i,j,k) = (nut(i+1,j,k) - nut(i-1,j,k))/2.d0
@@ -305,7 +306,7 @@ subroutine sa_rhs2(sa_rhs,nut,amu,pri_v,dxidx,inv_j,alpha,beta,gamma,re, &
 	do k = ks1,ke1
 	do j = js1,je1
 	do i = is1,ie1
-		if (j .eq. js) then
+		if     (j .eq. js) then
 			dnutdeta(i,j,k) = nut(i,j+1,k) - nut(i,j,k)
 		else if(j .eq. je) then
 			dnutdeta(i,j,k) = nut(i,j,k) - nut(i,j-1,k)
@@ -323,11 +324,11 @@ subroutine sa_rhs2(sa_rhs,nut,amu,pri_v,dxidx,inv_j,alpha,beta,gamma,re, &
 		do j = js1,je1
 		do i = is1,ie1
 			if     (k .eq. ks) then
-				dnutdxi(i,j,k) = nut(i,j,k+1) - nut(i,j,k)
+				dnutdzeta(i,j,k) = nut(i,j,k+1) - nut(i,j,k)
 			else if(k .eq. ke) then
-				dnutdxi(i,j,k) = nut(i,j,k) - nut(i,j,k-1)
+				dnutdzeta(i,j,k) = nut(i,j,k) - nut(i,j,k-1)
 			else
-				dnutdxi(i,j,k) = (nut(i,j,k+1) - nut(i,j,k-1))/2.d0
+				dnutdzeta(i,j,k) = (nut(i,j,k+1) - nut(i,j,k-1))/2.d0
 			end if    
 		end do
 		end do
@@ -356,9 +357,9 @@ subroutine sa_rhs2(sa_rhs,nut,amu,pri_v,dxidx,inv_j,alpha,beta,gamma,re, &
 	do k = ks1,ke1
 	do j = js1,je1
 	do i = is1,ie1
-		if (j .eq. js) then
+		if     (i .eq. is) then
 			tempa(i,j,k) = tempalpha(i+1,j,k) - tempalpha(i,j,k)
-		else if(j .eq. je) then
+		else if(i .eq. ie) then
 			tempa(i,j,k) = tempalpha(i,j,k) - tempalpha(i-1,j,k)
 		else
 			tempa(i,j,k) = (tempalpha(i+1,j,k) - tempalpha(i-1,j,k))/2.d0
@@ -388,11 +389,11 @@ subroutine sa_rhs2(sa_rhs,nut,amu,pri_v,dxidx,inv_j,alpha,beta,gamma,re, &
 		do j = js1,je1
 		do i = is1,ie1
 			if     (k .eq. ks) then
-				tempb(i,j,k) = tempbeta(i,j,k+1) - tempbeta(i,j,k)
+				tempc(i,j,k) = tempgamma(i,j,k+1) - tempgamma(i,j,k)
 			else if(k .eq. ke) then
-				tempb(i,j,k) = tempbeta(i,j,k) - tempbeta(i,j,k-1)
+				tempc(i,j,k) = tempgamma(i,j,k) - tempgamma(i,j,k-1)
 			else
-				tempb(i,j,k) = (tempbeta(i,j,k+1) - tempbeta(i,j,k-1))/2.d0
+				tempc(i,j,k) = (tempgamma(i,j,k+1) - tempgamma(i,j,k-1))/2.d0
 			end if    
 		end do
 		end do
@@ -445,11 +446,11 @@ subroutine sa_rhs2(sa_rhs,nut,amu,pri_v,dxidx,inv_j,alpha,beta,gamma,re, &
 		do j = js1,je1
 		do i = is1,ie1
 			if     (k .eq. ks) then
-				tempeta(i,j,k) = temp(i,j,k+1) - temp(i,j,k)
+				tempzeta(i,j,k) = temp(i,j,k+1) - temp(i,j,k)
 			else if(k .eq. ke) then
-				tempeta(i,j,k) = temp(i,j,k) - temp(i,j,k-1)
+				tempzeta(i,j,k) = temp(i,j,k) - temp(i,j,k-1)
 			else
-				tempeta(i,j,k) = (temp(i,j,k+1) - temp(i,j,k-1))/2.d0
+				tempzeta(i,j,k) = (temp(i,j,k+1) - temp(i,j,k-1))/2.d0
 			end if    
 		end do
 		end do
