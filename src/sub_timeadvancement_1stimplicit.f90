@@ -211,6 +211,7 @@ subroutine implicit1st(q,dt,pri_v,rhs,rhsi,rhsv,dxidx,inv_j, &
 	
 	
 	if (iflag_dimension .eq. iflag_2d) then
+		k = 1
 		!!forward sweep
 		do j = js1,je1
 		do i = is1,ie1

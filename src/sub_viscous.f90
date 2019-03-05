@@ -104,18 +104,14 @@ subroutine viscous_flux(rhsv,pri_v,amu,vor,dudx,tao,dxidx,inv_j,tinf,prl,prt,gam
 	!!*
 	
 	!! xi direction
-	!!call secondordercentral_1d(txi, t,is,ie,js,je,ks,ke,is1,ie1,js1,je1,ks1,ke1,1)
-	!!call secondordercentral_1d(uxi, u,is,ie,js,je,ks,ke,is1,ie1,js1,je1,ks1,ke1,1)
-	!!call secondordercentral_1d(vxi, v,is,ie,js,je,ks,ke,is1,ie1,js1,je1,ks1,ke1,1)
-
 	do k = ks0,ke0
 	do j = js0,je0
 	do i = is0,ie0
-		if      (i .eq. is) then
+		if      (i .eq. is0) then
 			txi(i,j,k) = t(i+1,j,k) - t(i,j,k)
 			uxi(i,j,k) = u(i+1,j,k) - u(i,j,k)
 			vxi(i,j,k) = v(i+1,j,k) - v(i,j,k)
-		else if (i .eq. ie) then
+		else if (i .eq. ie0) then
 			txi(i,j,k) = t(i,j,k) - t(i-1,j,k)
 			uxi(i,j,k) = u(i,j,k) - u(i-1,j,k)
 			vxi(i,j,k) = v(i,j,k) - v(i-1,j,k)
@@ -129,17 +125,14 @@ subroutine viscous_flux(rhsv,pri_v,amu,vor,dudx,tao,dxidx,inv_j,tinf,prl,prt,gam
  	end do
 
 	!! eta direction
-	!!call secondordercentral_1d(teta,t,is,ie,js,je,ks,ke,is1,ie1,js1,je1,ks1,ke1,2)
-	!!call secondordercentral_1d(ueta,u,is,ie,js,je,ks,ke,is1,ie1,js1,je1,ks1,ke1,2)
-	!!call secondordercentral_1d(veta,v,is,ie,js,je,ks,ke,is1,ie1,js1,je1,ks1,ke1,2)
 	do k = ks0,ke0
 	do j = js0,je0
 	do i = is0,ie0
-		if     (j .eq. js) then
+		if     (j .eq. js0) then
 			teta(i,j,k) = t(i,j+1,k) - t(i,j,k)
 			ueta(i,j,k) = u(i,j+1,k) - u(i,j,k)
 			veta(i,j,k) = v(i,j+1,k) - v(i,j,k)
-		else if(j .eq. je) then
+		else if(j .eq. je0) then
 			teta(i,j,k) = t(i,j,k) - t(i,j-1,k)
 			ueta(i,j,k) = u(i,j,k) - u(i,j-1,k)
 			veta(i,j,k) = v(i,j,k) - v(i,j-1,k)
@@ -158,11 +151,11 @@ subroutine viscous_flux(rhsv,pri_v,amu,vor,dudx,tao,dxidx,inv_j,tinf,prl,prt,gam
 		do k = ks0,ke0
 		do j = js0,je0
 		do i = is0,ie0
-			if     (k .eq. ks) then
+			if     (k .eq. ks0) then
 				teta(i,j,k) = t(i,j,k+1) - t(i,j,k)
 				ueta(i,j,k) = u(i,j,k+1) - u(i,j,k)
 				veta(i,j,k) = v(i,j,k+1) - v(i,j,k)
-			else if(k .eq. ke) then
+			else if(k .eq. ke0) then
 				teta(i,j,k) = t(i,j,k) - t(i,j,k-1)
 				ueta(i,j,k) = u(i,j,k) - u(i,j,k-1)
 				veta(i,j,k) = v(i,j,k) - v(i,j,k-1)
@@ -171,7 +164,7 @@ subroutine viscous_flux(rhsv,pri_v,amu,vor,dudx,tao,dxidx,inv_j,tinf,prl,prt,gam
 				ueta(i,j,k) = (u(i,j,k+1) - u(i,j,k-1))/2.d0
 				veta(i,j,k) = (v(i,j,k+1) - v(i,j,k-1))/2.d0
 			end if    
-		 end do
+		end do
 		end do
 		end do
 	end if
@@ -298,21 +291,17 @@ subroutine viscous_flux(rhsv,pri_v,amu,vor,dudx,tao,dxidx,inv_j,tinf,prl,prt,gam
 	end do
 	end do
 	!!*
-	
-	!!call secondordercentral_nd(fvxi, fv,is,ie,js,je,ks,ke,is1,ie1,js1,je1,ks1,ke1,5,1)
-	!!call secondordercentral_nd(gveta,gv,is,ie,js,je,ks,ke,is1,ie1,js1,je1,ks1,ke1,5,2)
+
 	do k = ks0,ke0
 	do j = js0,je0
 	do i = is0,ie0
-	do n = 1, 5
 		if      (i .eq. is0) then
-			fvxi(n,i,j,k) = fv(n,i+1,j,k) - fv(n,i,j,k)
+			fvxi(:,i,j,k) = fv(:,i+1,j,k) - fv(:,i,j,k)
 		else if (i .eq. ie0) then
-			fvxi(n,i,j,k) = fv(n,i,j,k) - fv(n,i-1,j,k)
+			fvxi(:,i,j,k) = fv(:,i,j,k) - fv(:,i-1,j,k)
 		else
-			fvxi(n,i,j,k) = (fv(n,i+1,j,k) - fv(n,i-1,j,k))/2.d0
+			fvxi(:,i,j,k) = (fv(:,i+1,j,k) - fv(:,i-1,j,k))/2.d0
 		end if
-	end do
 	end do
 	end do
 	end do
@@ -350,10 +339,6 @@ subroutine viscous_flux(rhsv,pri_v,amu,vor,dudx,tao,dxidx,inv_j,tinf,prl,prt,gam
 	end if
 
 	if (isDebug .eq. 1) then
-		print *, "***", is,ie,js,je,ks,ke,is1,ie1,js1,je1,ks1,ke1
-		print *, "***", fv(2,246,2,1), fv(2,248,2,1), fvxi(2,247,2,1)
-		print *, "***", fv(2,  0,2,1), fv(2,  2,2,1), fvxi(2,  1,2,1)
-
 		write(debugFile,"('result/debug_vis_fv_'I10.10'.dat')"),mm
 		write(*,*) "Writing ", debugFile
 		call DEBUG_OUTPUT_2D_5(debugFile,mm,fv,is,ie,js,je,ks,ke,is0,ie0,js0,je0)
@@ -373,11 +358,7 @@ subroutine viscous_flux(rhsv,pri_v,amu,vor,dudx,tao,dxidx,inv_j,tinf,prl,prt,gam
 	do k = ks0,ke0
 	do j = js0,je0
 	do i = is0,ie0
-		rhsv(1,i,j,k) = (fvxi(1,i,j,k) + gveta(1,i,j,k) + hvzeta(1,i,j,k))/re
-		rhsv(2,i,j,k) = (fvxi(2,i,j,k) + gveta(2,i,j,k) + hvzeta(2,i,j,k))/re
-		rhsv(3,i,j,k) = (fvxi(3,i,j,k) + gveta(3,i,j,k) + hvzeta(3,i,j,k))/re
-		rhsv(4,i,j,k) = (fvxi(4,i,j,k) + gveta(4,i,j,k) + hvzeta(4,i,j,k))/re
-		rhsv(5,i,j,k) = (fvxi(5,i,j,k) + gveta(5,i,j,k) + hvzeta(5,i,j,k))/re
+		rhsv(:,i,j,k) = (fvxi(:,i,j,k) + gveta(:,i,j,k) + hvzeta(:,i,j,k))/re
 	end do
 	end do
 	end do
