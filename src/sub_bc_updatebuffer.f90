@@ -507,7 +507,7 @@ subroutine UpdateBuffer
 							blk(m0)%q(5,i0,j0,k0-nBuffer) = ua2(nBuffer,5,i,j)
 
 							if (iflag_turbulence .eq. iflag_sa) then
-								blk(m0)%nut(i0,j0+nBuffer,k0) = ua2(nBuffer,6,i,j)
+								blk(m0)%nut(i0,j0,k0-nBuffer) = ua2(nBuffer,6,i,j)
 							end if
 						end do
 					end do
