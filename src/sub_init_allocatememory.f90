@@ -32,8 +32,10 @@ subroutine init_allocatememory
 	integer :: is1,ie1,js1,je1,ks1,ke1
 	integer :: subface
 
-	open(99,file = grid)
-	read(99,*) nblock
+	if(myid .eq. root)then
+		open(99,file = grid)
+		read(99,*) nblock
+	end if
 
 	!!read block dimension
 	allocate(tempni(nblock))
