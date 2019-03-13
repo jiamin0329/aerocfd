@@ -223,10 +223,13 @@ subroutine average1
 			ie_bc     = blk(m0)%bc(ksub)%ie
 			js_bc     = blk(m0)%bc(ksub)%js
 			je_bc     = blk(m0)%bc(ksub)%je
-			
+			ks_bc     = blk(m0)%bc(ksub)%ks
+			ke_bc     = blk(m0)%bc(ksub)%ke
+
 			n1 = ie_bc - is_bc + 1
 			n2 = je_bc - js_bc + 1
-			
+			n3 = ke_bc - ks_bc + 1
+
 			if (blk_t .ge. 0) then
 				!!neighb subface dimension
 				face_t  = blk0(blk_t)%bc0(subface_t)%face
@@ -422,7 +425,7 @@ subroutine average1
 						i0 = is_bc+i-1
 						j0 = js_bc+j-1
 						k0 = ke_bc
-								
+						print *, "**", m0, blk_loop, i0, j0, k0
 						blk(m0)%bc(ksub)%buffer(:,i0,j0,k0) = ua2(:,i,j)
 					end do
 					end do

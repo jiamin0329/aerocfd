@@ -48,6 +48,7 @@ program sjtucfd_mpi
 		write (*,*) '***********************************************************'
 	end if
 	call MPI_BARRIER(MPI_COMM_WORLD,ierr)
+	pause
 	!!*end print info page
 	
 	!!checking threads
@@ -131,7 +132,12 @@ program sjtucfd_mpi
 	!!call UpdateBufferCoordinate2d
 	call UpdateBufferCoordinate
 	call init_flowfield
-	
+
+	if(myid .eq. root)then
+		call CheckBoundary
+	end if
+	call MPI_BARRIER(MPI_COMM_WORLD,ierr)
+
 	!!grid spacing calculation
 	if(myid .eq. root)then
 		write(*,*) '***********************************************************'
@@ -249,10 +255,10 @@ program sjtucfd_mpi
 	
 	!!***************************************************!!
 	!!initial flowfield output
-	call jacobian_output
-	call geom_output
-	call flowfield_output
-	call surface_output 
+	!!call jacobian_output
+	!!call geom_output
+	!!call flowfield_output
+	!!call surface_output 
 	!!*
 	!!***************************************************!!
 	!!               end initialization                  !!
@@ -496,4 +502,41 @@ subroutine GetBufferLength(numBuffer, inviscidScheme)
 	end if
 
 	return
+end subroutine
+
+subroutine CheckBoundary()
+	use index_var
+	use blk_var
+	use glbindex_var
+	implicit none
+	integer :: iface
+
+	integer :: isPhyBound(6), isBlkInterface(6)
+
+	do m = 1,nblock
+	isPhyBound = 0
+	isBlkInterface = 0
+	do ksub = 1,blk0(m)%num_subface
+		if (blk0(m)%bc0(ksub)%blk_t .lt. 0) then
+			isPhyBound(blk0(m)%bc0(ksub)%face) = 1
+		end if
+
+		if (blk0(m)%bc0(ksub)%blk_t .gt. 0) then
+			isBlkInterface(blk0(m)%bc0(ksub)%face) = 1
+		end if
+	end do
+
+	do iface = 1,6
+		if (isPhyBound(iface) * isBlkInterface(iface) .eq. 1) then 
+			print *, "Please check boundary"
+			print *, "block:", m
+			do ksub = 1,blk0(m)%num_subface
+				print *, "ksub:", ksub, blk0(m)%bc0(ksub)%blk_t
+			end do
+			stop
+		end if
+	end do
+	end do
+
+	return 
 end subroutine
