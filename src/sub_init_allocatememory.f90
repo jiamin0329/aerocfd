@@ -456,17 +456,17 @@ subroutine init_allocatememory
 			call MPI_recv(tempy,idim*jdim*kdim,MPI_REAL8,source_id,98,MPI_COMM_WORLD,status,ierr)
 			call MPI_recv(tempz,idim*jdim*kdim,MPI_REAL8,source_id,99,MPI_COMM_WORLD,status,ierr)
 
-			is0 = global_is0(m0); ie0 = global_ie0(m0)
-			js0 = global_js0(m0); je0 = global_je0(m0)
-			ks0 = global_ks0(m0); ke0 = global_ke0(m0)
+			is0 = global_is0(m0 + myid*myn); ie0 = global_ie0(m0 + myid*myn)
+			js0 = global_js0(m0 + myid*myn); je0 = global_je0(m0 + myid*myn)
+			ks0 = global_ks0(m0 + myid*myn); ke0 = global_ke0(m0 + myid*myn)
 			do k = ks0,ke0
-				do j = js0,je0
-					do i = is0,ie0
-						blk(m0)%x(i,j,k) = tempx(i,j,k)
-						blk(m0)%y(i,j,k) = tempy(i,j,k)
-						blk(m0)%z(i,j,k) = tempz(i,j,k)
-					end do 
-				end do
+			do j = js0,je0
+			do i = is0,ie0
+				blk(m0)%x(i,j,k) = tempx(i,j,k)
+				blk(m0)%y(i,j,k) = tempy(i,j,k)
+				blk(m0)%z(i,j,k) = tempz(i,j,k)
+			end do 
+			end do
 			end do
 		end if
 		call MPI_BARRIER(MPI_COMM_WORLD,ierr)
