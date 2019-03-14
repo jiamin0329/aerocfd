@@ -3,7 +3,7 @@
 !! finite difference method                                         !!
 !! MPI version                                                      !!
 !!                                                                  !!
-!! Version 2.0 (with onverlap block interface implemented)          !!
+!! Version 2.0 (with overlap block interface implemented)          !!
 !! Author: Jiamin Xu                                                !!
 !!==================================================================!!
 program sjtucfd_mpi
@@ -33,7 +33,7 @@ program sjtucfd_mpi
 	call MPI_COMM_SIZE(MPI_COMM_WORLD, numprocs, ierr)
 	call MPI_GET_PROCESSOR_NAME(processor_name,namelen,ierr)
 	!!*end get mpi info
-	
+
 	!!print info page
 	if (myid .eq. root) then
 		write (*,*) '***********************************************************'
@@ -48,7 +48,6 @@ program sjtucfd_mpi
 		write (*,*) '***********************************************************'
 	end if
 	call MPI_BARRIER(MPI_COMM_WORLD,ierr)
-	pause
 	!!*end print info page
 	
 	!!checking threads
@@ -107,6 +106,16 @@ program sjtucfd_mpi
 		else if (mod(nblock,numprocs) .ne. 0) then
 			myn   = nblock/numprocs+1
 			lastn = nblock - myn*(numprocs-1)
+			
+			if (lastn .le. 0) then
+				myn   = nblock/numprocs
+				lastn = nblock - myn*(numprocs-1)
+			end if
+		end if
+
+		if (lastn .le. 0) then
+			print *, "Wrong block distribution!"
+			stop
 		end if
 		!!*
 	end if
@@ -129,7 +138,6 @@ program sjtucfd_mpi
 	call init_readbcinfo
 	call init_allocatememory
 	call init_readbcinfo2
-	!!call UpdateBufferCoordinate2d
 	call UpdateBufferCoordinate
 	call init_flowfield
 

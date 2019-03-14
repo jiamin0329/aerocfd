@@ -425,7 +425,6 @@ subroutine average1
 						i0 = is_bc+i-1
 						j0 = js_bc+j-1
 						k0 = ke_bc
-						print *, "**", m0, blk_loop, i0, j0, k0
 						blk(m0)%bc(ksub)%buffer(:,i0,j0,k0) = ua2(:,i,j)
 					end do
 					end do
