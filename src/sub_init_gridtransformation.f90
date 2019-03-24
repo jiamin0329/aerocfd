@@ -28,19 +28,20 @@ subroutine gridtransformation(dxidx,inv_j,alpha,beta,gamma,x,y,z, &
 	                          is,ie,js,je,ks,ke,                  &
 	                          is0,ie0,js0,je0,ks0,ke0,m0)
 	use flag_var
+	use mpi_var
 	implicit none
 	!!**********************************************************
 	integer :: m0
 	integer :: is, ie, js, je, ks, ke
 	integer :: is0,ie0,js0,je0,ks0,ke0
-	real*8  :: x        (  is:ie,js:je,ks:ke)
-	real*8  :: y        (  is:ie,js:je,ks:ke)
-	real*8  :: z        (  is:ie,js:je,ks:ke)
-	real*8  :: alpha    (3,is:ie,js:je,ks:ke)
-	real*8  :: beta     (3,is:ie,js:je,ks:ke)
-	real*8  :: gamma    (3,is:ie,js:je,ks:ke)
-	real*8  :: inv_j    (  is:ie,js:je,ks:ke)
-	real*8  :: dxidx    (9,is:ie,js:je,ks:ke)
+	real*8  :: x     (  is:ie,js:je,ks:ke)
+	real*8  :: y     (  is:ie,js:je,ks:ke)
+	real*8  :: z     (  is:ie,js:je,ks:ke)
+	real*8  :: alpha (3,is:ie,js:je,ks:ke)
+	real*8  :: beta  (3,is:ie,js:je,ks:ke)
+	real*8  :: gamma (3,is:ie,js:je,ks:ke)
+	real*8  :: inv_j (  is:ie,js:je,ks:ke)
+	real*8  :: dxidx (9,is:ie,js:je,ks:ke)
 	!!**********************************************************
 	integer :: i,j,k
 	
@@ -71,7 +72,6 @@ subroutine gridtransformation(dxidx,inv_j,alpha,beta,gamma,x,y,z, &
 	allocate(tempxixi    (6,is:ie,js:je,ks:ke))
 	allocate(tempetaeta  (6,is:ie,js:je,ks:ke))
 	allocate(tempzetazeta(6,is:ie,js:je,ks:ke))
-	
 	!!**********************************************************!!
 	!!                   load x,y,z to xyz                      !!
 	!!**********************************************************!!
@@ -90,7 +90,7 @@ subroutine gridtransformation(dxidx,inv_j,alpha,beta,gamma,x,y,z, &
 	!!*
 
 	if (isDebug .eq. 1) then
-		write(debugFile,"('result/DEBUG_xyz_'I10.10'.dat')"),m0
+		write(debugFile,"('result/DEBUG_xyz_'I10.10'_'I10.10'.dat')"),myid,m0
 		write(*,*) "Writing ", debugFile
 		
 		if      (iflag_dimension .eq. iflag_3d) then
@@ -103,20 +103,67 @@ subroutine gridtransformation(dxidx,inv_j,alpha,beta,gamma,x,y,z, &
 	!!**********************************************************!!
 	!!       get dxdxi,dxdeta,dxdzeta using cmpt scheme         !!
 	!!**********************************************************!! 
-	call secondordercentral_nd(dxdxi, xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,1)
-	call secondordercentral_nd(dxdeta,xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,2)
-		
-	if (iflag_dimension .eq. iflag_2d)then
+	
+	!!xi direction
+	do k = ks0,ke0
+	do j = js0,je0
+	do i = is0,ie0
+		if      (i .eq. is0) then
+			dxdxi(:,i,j,k) = xyz(:,i+1,j,k) - xyz(:,i,j,k)
+		else if (i .eq. ie0) then
+			dxdxi(:,i,j,k) = xyz(:,i,j,k) - xyz(:,i-1,j,k)
+		else 
+			dxdxi(:,i,j,k) = (xyz(:,i+1,j,k) - xyz(:,i-1,j,k))/2.d0
+		end if
+	end do
+	end do   
+	end do
+
+	!! eta direction
+	do k = ks0,ke0
+	do j = js0,je0
+	do i = is0,ie0
+		if      (j .eq. js0) then
+			dxdeta(:,i,j,k) = xyz(:,i,j+1,k) - xyz(:,i,j,k)
+		else if (j .eq. je0) then
+			dxdeta(:,i,j,k) = xyz(:,i,j,k) - xyz(:,i,j-1,k)
+		else 
+			dxdeta(:,i,j,k) = (xyz(:,i,j+1,k) - xyz(:,i,j-1,k))/2.d0
+		end if
+	end do
+	end do   
+	end do
+
+	!!call secondordercentral_nd(dxdxi, xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,1)
+	!!call secondordercentral_nd(dxdeta,xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,2)
+	if      (iflag_dimension .eq. iflag_2d)then
 		dxdzeta(1,:,:,:) = 0.d0
 		dxdzeta(2,:,:,:) = 0.d0
 		dxdzeta(3,:,:,:) = 1.d0
 	else if (iflag_dimension .eq. iflag_3d)then
-		call secondordercentral_nd(dxdzeta,xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,3)
+		!!call secondordercentral_nd(dxdxi,  xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,1)
+		!!call secondordercentral_nd(dxdeta, xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,2)
+		!!call secondordercentral_nd(dxdzeta,xyz,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,3,3)
+
+		!! zeta direction
+		do k = ks0,ke0
+		do j = js0,je0
+		do i = is0,ie0
+			if      (k .eq. ks0) then
+				dxdzeta(:,i,j,k) = xyz(:,i,j,k+1) - xyz(:,i,j,k)
+			else if (k .eq. ke0) then
+				dxdzeta(:,i,j,k) = xyz(:,i,j,k) - xyz(:,i,j,k-1)
+			else 
+				dxdzeta(:,i,j,k) = (xyz(:,i,j,k+1) - xyz(:,i,j,k-1))/2.d0
+			end if
+		end do
+		end do   
+		end do
 	end if
 	!!*
 	
 	if (isDebug .eq. 1) then
-		write(debugFile,"('result/debug_dxdxi_'I10.10'.dat')"),m0
+		write(debugFile,"('result/debug_dxdxi_'I10.10'_'I10.10'.dat')"),myid,m0
 		write(*,*) "Writing ", debugFile
 		open (99,file = debugFile)
 !   
@@ -135,7 +182,7 @@ subroutine gridtransformation(dxidx,inv_j,alpha,beta,gamma,x,y,z, &
 		end do
 		close(99)
 	end if
-	!!*********************************************************************!!
+	!!**********************************************************!!
 
 	!!**********************************************************!!
 	!!                       get 1/jac                          !!
@@ -166,7 +213,7 @@ subroutine gridtransformation(dxidx,inv_j,alpha,beta,gamma,x,y,z, &
 	!!*
 
 	if (isDebug .eq. 1) then
-		write(debugFile,"('result/debug_jacobian_'I10.10'.dat')"),m0
+		write(debugFile,"('result/debug_jacobian_'I10.10'_'I10.10'.dat')"),myid,m0
 		open (99,file = debugFile)
 		write(99,*) "variables = x,y,z,inv_j"
 		write(99,*) "zone i= ",ie0-is0+1, "j= ",je0-js0+1, "k= ",ke0-ks0+1,"datapacking=point"
@@ -285,6 +332,22 @@ subroutine gridtransformation(dxidx,inv_j,alpha,beta,gamma,x,y,z, &
 		do k = ks0,ke0
 		do j = js0,je0
 		do i = is0,ie0
+			!!dxdxi0 = dxdxi(1,i,j,k); dxdeta0 = dxdeta(1,i,j,k); dxdzeta0 = dxdzeta(1,i,j,k)
+			!!dydxi0 = dxdxi(2,i,j,k); dydeta0 = dxdeta(2,i,j,k); dydzeta0 = dxdzeta(2,i,j,k)
+			!!dzdxi0 = dxdxi(3,i,j,k); dzdeta0 = dxdeta(3,i,j,k); dzdzeta0 = dxdzeta(3,i,j,k)
+
+			!!dxidx(1,i,j,k) = (dydeta0*dzdzeta0 - dydzeta0*dzdeta0)/inv_j(i,j,k)!!(tempzetazeta(1,i,j,k) - tempetaeta  (1,i,j,k))/inv_j(i,j,k)
+			!!dxidx(2,i,j,k) = (dxdzeta0*dzdeta0 - dxdeta0*dzdzeta0)/inv_j(i,j,k)!!(tempzetazeta(2,i,j,k) - tempetaeta  (2,i,j,k))/inv_j(i,j,k)
+			!!dxidx(3,i,j,k) = (dxdeta0*dydzeta0 - dxdzeta0*dydeta0)/inv_j(i,j,k)!!(tempzetazeta(3,i,j,k) - tempetaeta  (3,i,j,k))/inv_j(i,j,k)
+			!!				
+			!!dxidx(4,i,j,k) = (dydzeta0*dzdxi0 - dydxi0*dzdzeta0)/inv_j(i,j,k)!!(tempxixi    (1,i,j,k) - tempzetazeta(4,i,j,k))/inv_j(i,j,k)
+			!!dxidx(5,i,j,k) = (dxdxi0*dzdzeta0 - dxdzeta0*dzdxi0)/inv_j(i,j,k)!!(tempxixi    (2,i,j,k) - tempzetazeta(5,i,j,k))/inv_j(i,j,k)
+			!!dxidx(6,i,j,k) = (dxdzeta0*dydxi0 - dxdxi0*dydzeta0)/inv_j(i,j,k)!!(tempxixi    (3,i,j,k) - tempzetazeta(6,i,j,k))/inv_j(i,j,k)
+			!!				
+			!!dxidx(7,i,j,k) = (dydxi0*dzdeta0 - dydeta0*dzdxi0)/inv_j(i,j,k)!!(tempetaeta  (4,i,j,k) - tempxixi    (4,i,j,k))/inv_j(i,j,k)
+			!!dxidx(8,i,j,k) = (dxdeta0*dzdxi0 - dxdxi0*dzdeta0)/inv_j(i,j,k)!!(tempetaeta  (5,i,j,k) - tempxixi    (5,i,j,k))/inv_j(i,j,k)
+			!!dxidx(9,i,j,k) = (dxdxi0*dydeta0 - dxdeta0*dydxi0)/inv_j(i,j,k)!!(tempetaeta  (6,i,j,k) - tempxixi    (6,i,j,k))/inv_j(i,j,k)
+
 			dxidx(1,i,j,k) = (tempzetazeta(1,i,j,k) - tempetaeta  (1,i,j,k))/inv_j(i,j,k)
 			dxidx(2,i,j,k) = (tempzetazeta(2,i,j,k) - tempetaeta  (2,i,j,k))/inv_j(i,j,k)
 			dxidx(3,i,j,k) = (tempzetazeta(3,i,j,k) - tempetaeta  (3,i,j,k))/inv_j(i,j,k)
@@ -302,7 +365,7 @@ subroutine gridtransformation(dxidx,inv_j,alpha,beta,gamma,x,y,z, &
 	end if
 
 	if (isDebug .eq. 1) then
-		write(debugFile,"('result/debug_dxidx_'I10.10'.dat')"),m0
+		write(debugFile,"('result/debug_dxidx_'I10.10'_'I10.10'.dat')"),myid,m0
 		open (99,file = debugFile)
 		write(99,*) "variables = x,y,z,dxidx, dxidy, dxidz, detadx, detady, detadz, dzetadx, dzetady, dzetadz"
 		write(99,*) "zone i= ",ie0-is0+1, "j= ",je0-js0+1, "k= ",ke0-ks0+1,"datapacking=point"
@@ -354,7 +417,7 @@ subroutine gridtransformation(dxidx,inv_j,alpha,beta,gamma,x,y,z, &
 	end do
 
 	if (isDebug .eq. 1) then
-		write(debugFile,"('result/debug_alpha_beta_gamma_'I10.10'.dat')"),m0
+		write(debugFile,"('result/debug_alpha_beta_gamma_'I10.10'_'I10.10'.dat')"),myid,m0
 		open (99,file = debugFile)
 		write(99,*) "variables = x,y,z,alpha1,alpha2,alpha3,beta1,beta2,beta3,gamma1,gamma2,gamma3"
 		write(99,*) "zone i= ",ie0-is0+1, "j= ",je0-js0+1, "k= ",ke0-ks0+1,"datapacking=point"
