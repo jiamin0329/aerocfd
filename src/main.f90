@@ -201,17 +201,6 @@ program sjtucfd_mpi
 		                        blk(m0)%x,blk(m0)%y,blk(m0)%z,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,m0)
 	end do
 
-	!! Update jacobian variables in buffer block
-	!!call UpdateBufferJacobian2d1
-	call UpdateBufferJacobian1
-	call MPI_BARRIER(MPI_COMM_WORLD,ierr)
-	!!call UpdateBufferJacobian2d2
-	call UpdateBufferJacobian2
-	call MPI_BARRIER(MPI_COMM_WORLD,ierr)
-	!!call UpdateBufferJacobian2d3
-	call UpdateBufferJacobian3
-	call MPI_BARRIER(MPI_COMM_WORLD,ierr)
-
 	if (isDebug .eq. 1) then
 	do m0 = 1,blk_loop
 		is = blk(m0)%is;ie = blk(m0)%ie
@@ -263,10 +252,10 @@ program sjtucfd_mpi
 	
 	!!***************************************************!!
 	!!initial flowfield output
-	!!call jacobian_output
-	!!call geom_output
-	!!call flowfield_output
-	!!call surface_output 
+	call jacobian_output
+	call geom_output
+	call flowfield_output
+	call surface_output 
 	!!*
 	!!***************************************************!!
 	!!               end initialization                  !!
@@ -300,9 +289,6 @@ program sjtucfd_mpi
 	!!***************************************************!!
 	!! update main equation in buffer block
 	call physical_bc
-	!!call UpdateBuffer2d
-	!!call average2d1
-	!!call average2d2
 	call UpdateBuffer
 	call average1
 	call average2
@@ -327,7 +313,7 @@ program sjtucfd_mpi
 
 	!!blk(m0)%rhsv = 0.d0
 	!!main loop
-	outinterval = 10
+	outinterval = 1
 	do timestep = 1,ntstep
 		if(iflag_timeadvance .eq. iflag_1stimplicit) then
 			do m0 = 1,blk_loop
@@ -428,8 +414,6 @@ program sjtucfd_mpi
 				ks1 = blk(m0)%ks1;ke1 = blk(m0)%ke1
 				call get_primitivevariables(m0,blk(m0)%pri_v,blk(m0)%q,gamma,cv,is,ie,js,je,ks,ke)
 			end do
-
-
 		end if
 
 		if(mod(timestep,outinterval) .eq. 0)then  !end in line639
