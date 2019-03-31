@@ -170,7 +170,7 @@ program sjtucfd_mpi
 		write(*,*) 'Finish computing grid space!'
 	end if
 
-	if(iflag_solver .eq. iflag_nssolver .and. iflag_turbulence .lt. 0) then
+	if(iflag_solver .eq. iflag_nssolver .and. iflag_turbulence .gt. 0) then
 		call init_walldist
 	end if
 
