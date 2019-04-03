@@ -17,6 +17,7 @@ subroutine physical_bc
     
 	integer :: face
 	integer :: is, ie, js, je, ks, ke
+	integer :: is0, ie0, js0, je0, ks0, ke0
 	integer :: is_bc,ie_bc,js_bc,je_bc,ks_bc,ke_bc
 
 	real*8 :: d,nut

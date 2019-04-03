@@ -257,6 +257,18 @@ program sjtucfd_mpi
 	call flowfield_output
 	call surface_output 
 	!!*
+
+	!!creat log file
+	if(myid .eq. root)then
+		open(99,file = 'result/clcd_history.dat',status = 'replace')
+		write (99,*) 'variables="flow time","cl","cd"'
+		close(99)
+		open(99,file = 'result/resi_history.dat',status = 'replace')
+		write (99,*) 'variables="timestep","rou","momentum u","momentum v","momentum w","energy","tur1","tur2"'
+		close(99)
+              
+	end if	
+
 	!!***************************************************!!
 	!!               end initialization                  !!
 	!!***************************************************!!
@@ -445,7 +457,7 @@ program sjtucfd_mpi
 				end if
 			end if    		
 			call residual
-			!!call clcd_output
+			call clcd_output
 		end if  !end of 10 steps output
 		!!*
                 
