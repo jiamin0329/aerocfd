@@ -58,6 +58,10 @@ subroutine residual
 5	format("D: ",E11.4," U: ",E11.4," V: ",E11.4," E: ",E11.4)
 		write(*,10) temp_tur(1)
 10	format("nut: ",E11.4)
+open(98, file = 'result/resi_history.dat', status = 'old', position = 'append')
+		write(98,16) timestep,temp(1),temp(2),temp(3),temp(4),temp(5),temp_tur(1)
+16			format(I6.6,6E11.4)
+        close(98)
 	end if
     
 	return
