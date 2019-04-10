@@ -293,7 +293,7 @@ program sjtucfd_mpi
 	t2 = MPI_WTIME()
 	!!*
 	
-	if(iflag_timeadvance .ne. iflag_1stimplicit .or. iflag_timeadvance .ne. iflag_2ndcrank) then
+	if(iflag_timeadvance .ne. iflag_1stimplicit .and. iflag_timeadvance .ne. iflag_2ndcrank) then
 		write(*,*) "NOT supported!"
 		stop
 	end if
