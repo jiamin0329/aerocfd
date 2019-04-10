@@ -282,7 +282,7 @@ subroutine init_allocatememory
 		
 		!!conservative variables
 		allocate (blk(m0)%q      (5,is:ie,js:je,ks:ke))
-		!!allocate (blk(m0)%q0(-1:0,5,is:ie,js:je,ks:ke))
+		allocate (blk(m0)%q0(-1:0,5,is:ie,js:je,ks:ke))
 		!!*
 		
 		!!inviscid term

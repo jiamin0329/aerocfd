@@ -62,6 +62,7 @@ obj_output = ./obj/sub_output_checking.o           \
              ./obj/sub_output_acousticfile.o
               
 obj_time = ./obj/sub_timeadvancement_1stimplicit.o  \
+           ./obj/sub_timeadvancement_2ndcrank.o     \
            ./obj/sub_timeadvancement_finddt.o       \
            ./obj/sub_timeadvancement_jac.o
 
@@ -317,7 +318,10 @@ all:	$(objs)
 #obj_time
 ./obj/sub_timeadvancement_1stimplicit.o: sub_timeadvancement_1stimplicit.f90 \
                                          module_flags.f90
-	$(fc) -c $(fflag) -o $@ $<	      
+	$(fc) -c $(fflag) -o $@ $<	  
+./obj/sub_timeadvancement_2ndcrank.o: sub_timeadvancement_2ndcrank.f90 \
+                                         module_flags.f90
+	$(fc) -c $(fflag) -o $@ $<	  
 ./obj/sub_timeadvancement_finddt.o: sub_timeadvancement_finddt.f90
 	$(fc) -c $(fflag) -o $@ $<	
 ./obj/sub_timeadvancement_jac.o: sub_timeadvancement_jac.f90

@@ -428,6 +428,80 @@ program sjtucfd_mpi
 			end do
 		end if
 
+		if (iflag_timeadvance .eq. iflag_2ndcrank) then 
+			do sub = 1,3
+			!!update boundary condition
+			call physical_bc
+			call updatebuffer
+			call average1
+			call average2
+
+			do m0 = 1,blk_loop
+				is  = blk(m0)%is; ie  = blk(m0)%ie
+				js  = blk(m0)%js; je  = blk(m0)%je
+				ks  = blk(m0)%ks; ke  = blk(m0)%ke
+		
+				is0 = blk(m0)%is0;ie0 = blk(m0)%ie0
+				js0 = blk(m0)%js0;je0 = blk(m0)%je0
+				ks0 = blk(m0)%ks0;ke0 = blk(m0)%ke0
+
+				is1 = blk(m0)%is1;ie1 = blk(m0)%ie1
+				js1 = blk(m0)%js1;je1 = blk(m0)%je1
+				ks1 = blk(m0)%ks1;ke1 = blk(m0)%ke1
+
+				call get_primitivevariables(m0,blk(m0)%pri_v,blk(m0)%q,gamma,cv,is,ie,js,je,ks,ke)
+
+				call inviscid_flux_1(blk(m0)%rhsi,blk(m0)%q,blk(m0)%dxidx,blk(m0)%inv_j, &
+									 is,ie,js,je,ks,ke, &
+									 is0,ie0,js0,je0,ks0,ke0, &
+									 is1,ie1,js1,je1,ks1,ke1,gamma)		
+
+				if(iflag_solver .eq. iflag_nssolver) then
+					call viscous_flux(blk(m0)%rhsv,blk(m0)%pri_v,blk(m0)%amu,blk(m0)%vor,blk(m0)%dudx,blk(m0)%tao, &
+									  blk(m0)%dxidx,blk(m0)%inv_j,tinf,prl,prt,gamma,cv,re, &
+									  is,ie,js,je,ks,ke, &
+									  is0,ie0,js0,je0,ks0,ke0, &
+									  is1,ie1,js1,je1,ks1,ke1,m0)
+				end if
+				!!*
+
+				!!implicit time-advancement
+				call find_dt(blk(m0)%dt,dtmax,dtmin,cflmax,cflmin,blk(m0)%pri_v,blk(m0)%amu, &
+							 blk(m0)%dxidx,re,cfl,is,ie,js,je,ks,ke,iflag_time,iflag_steady,iflag_unsteady)
+
+				call crank2nd(blk(m0)%q,blk(m0)%q0,blk(m0)%dt,blk(m0)%pri_v,blk(m0)%rhs,blk(m0)%rhsi,blk(m0)%rhsv, &
+							  blk(m0)%dxidx,blk(m0)%inv_j, &
+							  is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,is1,ie1,js1,je1,ks1,ke1, &
+							  gamma,cfl,blk(m0)%x,blk(m0)%y,blk(m0)%z)
+
+				call update_q0(blk(m0)%q0,blk(m0)%q,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
+			end do !!* end block loop
+			end do !!* end sub iteration
+
+			!!turbulence
+			do m0 = 1,blk_loop
+				is  = blk(m0)%is; ie  = blk(m0)%ie
+				js  = blk(m0)%js; je  = blk(m0)%je
+				ks  = blk(m0)%ks; ke  = blk(m0)%ke
+		
+				is0 = blk(m0)%is0;ie0 = blk(m0)%ie0
+				js0 = blk(m0)%js0;je0 = blk(m0)%je0
+				ks0 = blk(m0)%ks0;ke0 = blk(m0)%ke0
+
+				is1 = blk(m0)%is1;ie1 = blk(m0)%ie1
+				js1 = blk(m0)%js1;je1 = blk(m0)%je1
+				ks1 = blk(m0)%ks1;ke1 = blk(m0)%ke1
+				
+				if(iflag_turbulence .eq. iflag_sa .and. iflag_solver .eq. iflag_nssolver) then
+					call sa_model(blk(m0)%nut,blk(m0)%sa_rhs,blk(m0)%dt,blk(m0)%pri_v,blk(m0)%amu,blk(m0)%dudx,blk(m0)%vor, &
+								  blk(m0)%dxidx,blk(m0)%inv_j,blk(m0)%aalpha,blk(m0)%bbeta,blk(m0)%ggamma, &
+								  blk(m0)%length,blk(m0)%dist,blk(m0)%spacing,re,cfl, &
+								  is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,is1,ie1,js1,je1,ks1,ke1)	
+				end if			
+			end do
+			!!*  end turbulence part
+		end if
+
 		if(mod(timestep,outinterval) .eq. 0)then  !end in line639
 			t1 = t2
 			t2 = MPI_WTIME()
@@ -543,4 +617,25 @@ subroutine CheckBoundary()
 	end do
 
 	return 
+end subroutine
+
+subroutine update_q0(q0,q,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
+	implicit none
+	
+	integer :: i,j,k
+	integer :: is,ie,js,je,ks,ke
+	integer :: is0,ie0,js0,je0,ks0,ke0
+	real*8  :: q0(-1:0,5,is:ie,js:je,ks:ke)
+	real*8  :: q (     5,is:ie,js:je,ks:ke)
+
+	do k = ks0,ke0
+	do j = js0,je0
+	do i = is0,ie0
+		q0(-1,:,i,j,k) = q0(0,:,i,j,k)
+		q0( 0,:,i,j,k) = q (  :,i,j,k)
+	end do
+	end do
+	end do
+	
+	return
 end subroutine

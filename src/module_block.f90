@@ -32,6 +32,7 @@ module blk_var
 		!!4: d*w
 		!!5: d*E
 		real*8,pointer,dimension(:,:,:,:):: q
+		real*8,pointer,dimension(:,:,:,:,:):: q0
 		!!primitive variables
 		!!1:d  2:u  3:v
 		!!4:w  5:p  6:t  7:c
