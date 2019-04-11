@@ -101,7 +101,6 @@ subroutine crank2nd(q,q0,dt,pri_v,rhs,rhsi,rhsv,dxidx,inv_j, &
 	!!initialize dq
 	dq = 0.d0
 	
-	if (iflag_dimension .eq. iflag_2d) then
 		!!==============================================================
 		!!                      xi direction                                                      
 		!!==============================================================
@@ -333,9 +332,122 @@ subroutine crank2nd(q,q0,dt,pri_v,rhs,rhsi,rhsv,dxidx,inv_j, &
 		end do
 		end do
 		!!=====================end eta direction=========================	
-	else if (iflag_dimension .eq. iflag_3d) then
-		print *, "2nd crank for 3d is not supported!"
-		stop
+	if (iflag_dimension .eq. iflag_3d) then
+		!!===============================================================
+		!!                      zeta direction
+		!!===============================================================
+		do j = js1,je1
+		do i = is1,ie1
+			do k = ks1-1,ke1+1
+				d  = pri_v(1,i,j,k)
+				u  = pri_v(2,i,j,k)
+				v  = pri_v(3,i,j,k)
+				w  = pri_v(4,i,j,k)
+				p  = pri_v(5,i,j,k)
+				c  = pri_v(7,i,j,k)
+					
+				dxidx0 = dxidx(7,i,j,k)
+				dxidy0 = dxidx(8,i,j,k)
+				dxidz0 = dxidx(9,i,j,k)
+  	              
+				temp = dxidx0**2 + dxidy0**2 + dxidz0**2
+				temp = sqrt(temp)
+				cu   = u*dxidx0 + v*dxidy0 + w*dxidz0
+					
+				rou(i,j,k) = abs(cu) + abs(c*temp)
+			end do
+			!! forward sweep                                                
+			do k = ks1+1,ke1
+				d  = pri_v(1,i,j,k-1)
+				u  = pri_v(2,i,j,k-1)
+				v  = pri_v(3,i,j,k-1)
+				w  = pri_v(4,i,j,k-1)
+				p  = pri_v(5,i,j,k-1)
+				c  = pri_v(7,i,j,k-1)
+					
+				dxidx0 = dxidx(7,i,j,k-1)
+				dxidy0 = dxidx(8,i,j,k-1)
+				dxidz0 = dxidx(9,i,j,k-1)
+					
+				q2 = 0.5d0*(u**2 + v**2 + w**2)         				
+				r  = rou(i,j,k-1) 
+				h  = (c**2.d0)/(gamma-1.d0) + q2 
+				cu = dxidx0*u + dxidy0*v + dxidz0*w 
+					
+				s1 = dq(1,i,j,k-1) 
+				s2 = dq(2,i,j,k-1) 
+				s3 = dq(3,i,j,k-1) 
+				s4 = dq(4,i,j,k-1) 
+				s5 = dq(5,i,j,k-1)
+				!!================================================                                                  
+				!!sub iteration
+				hdv = 0.5d0*dtsub(i,j,k)
+				b1  = hdv*(-cu*s1 + dxidx0*s2 + dxidy0*s3 + dxidz0*s4) 
+				b2  = hdv*( q2*s1      - u*s2      - v*s3      - w*s4 + s5)*(gamma-1.d0)
+				b3  = hdv*( cu+r ) 
+				a1  = b1               + b3*s1 
+				a2  = b1*u + b2*dxidx0 + b3*s2 
+				a3  = b1*v + b2*dxidy0 + b3*s3 
+				a4  = b1*w + b2*dxidz0 + b3*s4 
+				a5  = b1*h + b2*cu     + b3*s5 
+				!!================================================
+				r = rou(i,j,k)
+				!!sub iteration
+				div = 1.d0/(1.d0 + dtsub(i,j,k)*r) 
+				dq(1,i,j,k) = div*(dq(1,i,j,k) + a1) 
+				dq(2,i,j,k) = div*(dq(2,i,j,k) + a2) 
+				dq(3,i,j,k) = div*(dq(3,i,j,k) + a3) 
+				dq(4,i,j,k) = div*(dq(4,i,j,k) + a4) 
+				dq(5,i,j,k) = div*(dq(5,i,j,k) + a5) 
+			end do
+			!! backward sweep 
+			do k = ke1-1,ks1,-1
+				d  = pri_v(1,i,j,k+1)
+				u  = pri_v(2,i,j,k+1)
+				v  = pri_v(3,i,j,k+1)
+				w  = pri_v(4,i,j,k+1)
+				p  = pri_v(5,i,j,k+1)
+				c  = pri_v(7,i,j,k+1)
+					
+				dxidx0 = dxidx(7,i,j,k+1)
+				dxidy0 = dxidx(8,i,j,k+1)
+				dxidz0 = dxidx(9,i,j,k+1)
+					
+				q2 = 0.5d0*(u**2 + v**2 + w**2)        				
+				r  = rou(i,j,k+1)
+				h  = (c**2.d0)/(gamma-1.d0) + q2
+					
+				cu = dxidx0*u + dxidy0*v + dxidz0*w
+					
+				s1 = dq(1,i,j,k+1)
+				s2 = dq(2,i,j,k+1)
+				s3 = dq(3,i,j,k+1)
+				s4 = dq(4,i,j,k+1)
+				s5 = dq(5,i,j,k+1)
+				!!================================================                                                 
+				!!sub iteration
+				hdv = 0.5d0*dtsub(i,j,k)
+				b1  = hdv*(- cu*s1 + dxidx0*s2 + dxidy0*s3 + dxidz0*s4)
+				b2  = hdv*(  q2*s1      - u*s2      - v*s3      - w*s4 + s5)*(gamma-1.d0)
+				b3  = hdv*(  cu-r )
+				a1  = b1               + b3*s1
+				a2  = b1*u + b2*dxidx0 + b3*s2
+				a3  = b1*v + b2*dxidy0 + b3*s3
+				a4  = b1*w + b2*dxidz0 + b3*s4
+				a5  = b1*h + b2*cu     + b3*s5
+				!!================================================
+				r = rou(i,j,k)                                  
+				!!sub iteration
+				div = 1.d0/(1.d0 + dtsub(i,j,k)*r) 
+				dq(1,i,j,k) = dq(1,i,j,k) - div*a1
+				dq(2,i,j,k) = dq(2,i,j,k) - div*a2
+				dq(3,i,j,k) = dq(3,i,j,k) - div*a3
+				dq(4,i,j,k) = dq(4,i,j,k) - div*a4
+				dq(5,i,j,k) = dq(5,i,j,k) - div*a5
+			end do
+		end do
+		end do
+		!!====================end zeta direction=======================	
 	end if
 	
 	!!update q
