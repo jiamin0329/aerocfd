@@ -430,12 +430,6 @@ program sjtucfd_mpi
 
 		if (iflag_timeadvance .eq. iflag_2ndcrank) then 
 			do sub = 1,3
-			!!update boundary condition
-			call physical_bc
-			call updatebuffer
-			call average1
-			call average2
-
 			do m0 = 1,blk_loop
 				is  = blk(m0)%is; ie  = blk(m0)%ie
 				js  = blk(m0)%js; je  = blk(m0)%je
@@ -472,11 +466,35 @@ program sjtucfd_mpi
 				call crank2nd(blk(m0)%q,blk(m0)%q0,blk(m0)%dt,blk(m0)%pri_v,blk(m0)%rhs,blk(m0)%rhsi,blk(m0)%rhsv, &
 							  blk(m0)%dxidx,blk(m0)%inv_j, &
 							  is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,is1,ie1,js1,je1,ks1,ke1, &
-							  gamma,cfl,blk(m0)%x,blk(m0)%y,blk(m0)%z)
+							  gamma,m0,sub)
+
+				!!write(debugFile,"('result/debug_q_'I10.10'.dat')"),sub
+				!!write(*,*) "debugging ", sub
+				!!call DEBUG_OUTPUT_2D_5(debugFile,m0,blk(m0)%q,is,ie,js,je,ks,ke,is0,ie0,js0,je0)
+			end do !!* end block loop
+			end do !!* end sub iteration loop
+
+			do m0 = 1,blk_loop
+				is  = blk(m0)%is; ie  = blk(m0)%ie
+				js  = blk(m0)%js; je  = blk(m0)%je
+				ks  = blk(m0)%ks; ke  = blk(m0)%ke
+		
+				is0 = blk(m0)%is0;ie0 = blk(m0)%ie0
+				js0 = blk(m0)%js0;je0 = blk(m0)%je0
+				ks0 = blk(m0)%ks0;ke0 = blk(m0)%ke0
+
+				is1 = blk(m0)%is1;ie1 = blk(m0)%ie1
+				js1 = blk(m0)%js1;je1 = blk(m0)%je1
+				ks1 = blk(m0)%ks1;ke1 = blk(m0)%ke1
 
 				call update_q0(blk(m0)%q0,blk(m0)%q,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
-			end do !!* end block loop
-			end do !!* end sub iteration
+			end do
+
+			!!update boundary condition
+			call physical_bc
+			call updatebuffer
+			call average1
+			call average2
 
 			!!turbulence
 			do m0 = 1,blk_loop
@@ -500,6 +518,22 @@ program sjtucfd_mpi
 				end if			
 			end do
 			!!*  end turbulence part
+
+			do m0 = 1,blk_loop
+				is  = blk(m0)%is; ie  = blk(m0)%ie
+				js  = blk(m0)%js; je  = blk(m0)%je
+				ks  = blk(m0)%ks; ke  = blk(m0)%ke
+		
+				is0 = blk(m0)%is0;ie0 = blk(m0)%ie0
+				js0 = blk(m0)%js0;je0 = blk(m0)%je0
+				ks0 = blk(m0)%ks0;ke0 = blk(m0)%ke0
+
+				is1 = blk(m0)%is1;ie1 = blk(m0)%ie1
+				js1 = blk(m0)%js1;je1 = blk(m0)%je1
+				ks1 = blk(m0)%ks1;ke1 = blk(m0)%ke1
+				call get_primitivevariables(m0,blk(m0)%pri_v,blk(m0)%q,gamma,cv,is,ie,js,je,ks,ke)
+			end do
+
 		end if
 
 		if(mod(timestep,outinterval) .eq. 0)then  !end in line639

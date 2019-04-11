@@ -75,11 +75,11 @@ subroutine init_flowfield
 				blk(m0)%q(4,i,j,k) = 0.d0
 				blk(m0)%q(5,i,j,k) = d_0*t_0*cv + 0.5d0*d_0*u_0*u_0
                 
-				!!blk(m0)%q0(:,1,i,j,k) = blk(m0)%q(1,i,j,k)
-				!!blk(m0)%q0(:,2,i,j,k) = blk(m0)%q(2,i,j,k)
-				!!blk(m0)%q0(:,3,i,j,k) = blk(m0)%q(3,i,j,k)
-				!!blk(m0)%q0(:,4,i,j,k) = blk(m0)%q(4,i,j,k)
-				!!blk(m0)%q0(:,5,i,j,k) = blk(m0)%q(5,i,j,k)
+				blk(m0)%q0(:,1,i,j,k) = blk(m0)%q(1,i,j,k)
+				blk(m0)%q0(:,2,i,j,k) = blk(m0)%q(2,i,j,k)
+				blk(m0)%q0(:,3,i,j,k) = blk(m0)%q(3,i,j,k)
+				blk(m0)%q0(:,4,i,j,k) = blk(m0)%q(4,i,j,k)
+				blk(m0)%q0(:,5,i,j,k) = blk(m0)%q(5,i,j,k)
 						
 				!!primitive variables
 				blk(m0)%pri_v(1,i,j,k) = d_0
