@@ -515,14 +515,14 @@ program sjtucfd_mpi
 								  blk(m0)%length,blk(m0)%dist,blk(m0)%spacing,re,cfl, &
 								  is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,is1,ie1,js1,je1,ks1,ke1)	
 				end if		
-				
-				!!update boundary condition
-				call physical_bc
-				call updatebuffer
-				call average1
-				call average2	
 			end do
 			!!*  end turbulence part
+			
+			!!update boundary condition
+			call physical_bc
+			call updatebuffer
+			call average1
+			call average2	
 
 			do m0 = 1,blk_loop
 				is  = blk(m0)%is; ie  = blk(m0)%ie
