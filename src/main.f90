@@ -430,6 +430,11 @@ program sjtucfd_mpi
 
 		if (iflag_timeadvance .eq. iflag_2ndcrank) then 
 			do sub = 1,3
+			call physical_bc
+			call updatebuffer
+			call average1
+			call average2
+
 			do m0 = 1,blk_loop
 				is  = blk(m0)%is; ie  = blk(m0)%ie
 				js  = blk(m0)%js; je  = blk(m0)%je
@@ -490,12 +495,6 @@ program sjtucfd_mpi
 				call update_q0(blk(m0)%q0,blk(m0)%q,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
 			end do
 
-			!!update boundary condition
-			call physical_bc
-			call updatebuffer
-			call average1
-			call average2
-
 			!!turbulence
 			do m0 = 1,blk_loop
 				is  = blk(m0)%is; ie  = blk(m0)%ie
@@ -515,7 +514,13 @@ program sjtucfd_mpi
 								  blk(m0)%dxidx,blk(m0)%inv_j,blk(m0)%aalpha,blk(m0)%bbeta,blk(m0)%ggamma, &
 								  blk(m0)%length,blk(m0)%dist,blk(m0)%spacing,re,cfl, &
 								  is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,is1,ie1,js1,je1,ks1,ke1)	
-				end if			
+				end if		
+				
+				!!update boundary condition
+				call physical_bc
+				call updatebuffer
+				call average1
+				call average2	
 			end do
 			!!*  end turbulence part
 
