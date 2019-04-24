@@ -196,9 +196,9 @@ subroutine init_allocatememory
 	!!tempni/tempnj/tempnk ---> nx,ny,nz
 	if      (myid .lt. numprocs-1) then
 		do m0 = 1,myn
-			blk(m0)%ni = global_ie(m0+myid*myn)-global_is(m0+myid*myn)+1
-			blk(m0)%nj = global_je(m0+myid*myn)-global_js(m0+myid*myn)+1
-			blk(m0)%nk = global_ke(m0+myid*myn)-global_ks(m0+myid*myn)+1
+			blk(m0)%ni = global_ie0(m0+myid*myn)-global_is0(m0+myid*myn)+1
+			blk(m0)%nj = global_je0(m0+myid*myn)-global_js0(m0+myid*myn)+1
+			blk(m0)%nk = global_ke0(m0+myid*myn)-global_ks0(m0+myid*myn)+1
 			temp = temp + blk(m0)%ni*blk(m0)%nj*blk(m0)%nk
 
 			blk(m0)%is  = global_is (m0+myid*myn)
@@ -224,9 +224,9 @@ subroutine init_allocatememory
 		end do
 	else if (myid .eq. numprocs-1) then
 		do m0 = 1,lastn
-			blk(m0)%ni = global_ie(nblock-lastn+m0)-global_is(nblock-lastn+m0)+1
-			blk(m0)%nj = global_je(nblock-lastn+m0)-global_js(nblock-lastn+m0)+1
-			blk(m0)%nk = global_ke(nblock-lastn+m0)-global_ks(nblock-lastn+m0)+1
+			blk(m0)%ni = global_ie0(nblock-lastn+m0)-global_is0(nblock-lastn+m0)+1
+			blk(m0)%nj = global_je0(nblock-lastn+m0)-global_js0(nblock-lastn+m0)+1
+			blk(m0)%nk = global_ke0(nblock-lastn+m0)-global_ks0(nblock-lastn+m0)+1
 			temp = temp + blk(m0)%ni*blk(m0)%nj*blk(m0)%nk
 
 			blk(m0)%is  = global_is (nblock-lastn+m0)

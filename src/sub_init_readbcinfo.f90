@@ -278,6 +278,8 @@ subroutine init_readbcinfo2
 	real*8,dimension(:,:,:),allocatable :: temp_subface
 	integer :: i,j,k
 
+	real*8 :: dist
+
 	integer :: m_t,ksub_t
 	integer :: is_s,ie_s,js_s,je_s,ks_s,ke_s
 	integer :: is_r,ie_r,js_r,je_r,ks_r,ke_r
@@ -288,19 +290,20 @@ subroutine init_readbcinfo2
 			jdim_subface = blk0(m)%bc0(ksub)%je - blk0(m)%bc0(ksub)%js + 1
 			kdim_subface = blk0(m)%bc0(ksub)%ke - blk0(m)%bc0(ksub)%ks + 1	
 			
-			print *, "********", myid, m, ksub, "face:", blk0(m)%bc0(ksub)%face, idim_subface, jdim_subface, kdim_subface
+			!!print *, "********", myid, m, ksub, "face:", blk0(m)%bc0(ksub)%face, idim_subface, jdim_subface, kdim_subface
+			!! all ranks - allocate memory for xyz
 			if      (blk0(m)%bc0(ksub)%face .eq. 1 .or. blk0(m)%bc0(ksub)%face .eq. 2) then
-				allocate(temp_subface(3, jdim_subface, kdim_subface))
+				allocate(    temp_subface(3, jdim_subface,kdim_subface))
 				allocate(blk0(m)%bc0(ksub)%x(jdim_subface,kdim_subface))
 				allocate(blk0(m)%bc0(ksub)%y(jdim_subface,kdim_subface))
 				allocate(blk0(m)%bc0(ksub)%z(jdim_subface,kdim_subface))
 			else if (blk0(m)%bc0(ksub)%face .eq. 3 .or. blk0(m)%bc0(ksub)%face .eq. 4) then
-				allocate(temp_subface(3, idim_subface, kdim_subface))
+				allocate(    temp_subface(3, idim_subface,kdim_subface))
 				allocate(blk0(m)%bc0(ksub)%x(idim_subface,kdim_subface))
 				allocate(blk0(m)%bc0(ksub)%y(idim_subface,kdim_subface))
 				allocate(blk0(m)%bc0(ksub)%z(idim_subface,kdim_subface))
 			else if	(blk0(m)%bc0(ksub)%face .eq. 5 .or. blk0(m)%bc0(ksub)%face .eq. 6) then
-				allocate(temp_subface(3, idim_subface, jdim_subface))
+				allocate(    temp_subface(3, idim_subface,jdim_subface))
 				allocate(blk0(m)%bc0(ksub)%x(idim_subface,jdim_subface))
 				allocate(blk0(m)%bc0(ksub)%y(idim_subface,jdim_subface))
 				allocate(blk0(m)%bc0(ksub)%z(idim_subface,jdim_subface))
@@ -308,8 +311,8 @@ subroutine init_readbcinfo2
 			call MPI_BARRIER(MPI_COMM_WORLD,ierr)
 
 			call m2node(dest_id,m,myn,lastn,nblock,numprocs)
+			!! find out which rank does current block is stored in
 			if      (dest_id .eq. myid) then
-				m0 = m - myid*myn
 				!!print *, "********", myid, m, blk0(m)%ni, blk0(m)%nj, blk0(m)%nk
 				!! i- face
 				if (blk0(m)%bc0(ksub)%face .eq. 1) then
@@ -378,38 +381,48 @@ subroutine init_readbcinfo2
 				end if
 			end if
 			call MPI_BARRIER(MPI_COMM_WORLD,ierr)
+			!!*
 
+			!! broadcast to the other ranks
 			call m2node(dest_id,m,myn,lastn,nblock,numprocs)
-			call MPI_BCAST(temp_subface, idim_subface*jdim_subface*kdim_subface, MPI_REAL8, dest_id, MPI_COMM_WORLD,ierr)
+			!!print *,  myid, dest_id
+			call MPI_BCAST(temp_subface, 3*idim_subface*jdim_subface*kdim_subface, MPI_REAL8, dest_id, MPI_COMM_WORLD,ierr)
 			call MPI_BARRIER(MPI_COMM_WORLD,ierr)
-		
-			do k = blk0(m)%bc0(ksub)%ks-blk0(m)%bc0(ksub)%ks+1, blk0(m)%bc0(ksub)%ke-blk0(m)%bc0(ksub)%ks+1
-			do j = blk0(m)%bc0(ksub)%js-blk0(m)%bc0(ksub)%js+1, blk0(m)%bc0(ksub)%je-blk0(m)%bc0(ksub)%js+1
-			do i = blk0(m)%bc0(ksub)%is-blk0(m)%bc0(ksub)%is+1, blk0(m)%bc0(ksub)%ie-blk0(m)%bc0(ksub)%is+1
+			!!*
+
+			do k = 1, kdim_subface
+			do j = 1, jdim_subface
+			do i = 1, idim_subface
 				if 		(blk0(m)%bc0(ksub)%face .eq. 1) then
 					blk0(m)%bc0(ksub)%x(j,k) = temp_subface(1,j,k)
 					blk0(m)%bc0(ksub)%y(j,k) = temp_subface(2,j,k)
 					blk0(m)%bc0(ksub)%z(j,k) = temp_subface(3,j,k)
+					dist = temp_subface(3,j,k)
 				else if (blk0(m)%bc0(ksub)%face .eq. 2) then
 					blk0(m)%bc0(ksub)%x(j,k) = temp_subface(1,j,k)
 					blk0(m)%bc0(ksub)%y(j,k) = temp_subface(2,j,k)
 					blk0(m)%bc0(ksub)%z(j,k) = temp_subface(3,j,k)
+					dist = temp_subface(3,j,k)
 				else if (blk0(m)%bc0(ksub)%face .eq. 3) then
 					blk0(m)%bc0(ksub)%x(i,k) = temp_subface(1,i,k)
 					blk0(m)%bc0(ksub)%y(i,k) = temp_subface(2,i,k)
 					blk0(m)%bc0(ksub)%z(i,k) = temp_subface(3,i,k)
+					dist = temp_subface(3,i,k)
 				else if	(blk0(m)%bc0(ksub)%face .eq. 4) then
 					blk0(m)%bc0(ksub)%x(i,k) = temp_subface(1,i,k)
 					blk0(m)%bc0(ksub)%y(i,k) = temp_subface(2,i,k)
 					blk0(m)%bc0(ksub)%z(i,k) = temp_subface(3,i,k)
+					dist = temp_subface(3,i,k)
 				else if	(blk0(m)%bc0(ksub)%face .eq. 5) then
 					blk0(m)%bc0(ksub)%x(i,j) = temp_subface(1,i,j)
 					blk0(m)%bc0(ksub)%y(i,j) = temp_subface(2,i,j)
 					blk0(m)%bc0(ksub)%z(i,j) = temp_subface(3,i,j)
+					dist = temp_subface(3,i,j)
 				else if	(blk0(m)%bc0(ksub)%face .eq. 6) then
 					blk0(m)%bc0(ksub)%x(i,j) = temp_subface(1,i,j)
 					blk0(m)%bc0(ksub)%y(i,j) = temp_subface(2,i,j)
 					blk0(m)%bc0(ksub)%z(i,j) = temp_subface(3,i,j)
+					dist = temp_subface(3,i,j)
 				end if
 			end do
 			end do
