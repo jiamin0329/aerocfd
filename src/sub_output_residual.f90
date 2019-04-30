@@ -49,10 +49,11 @@ subroutine residual
 	call MPI_Reduce(resi_rms,temp,    5,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
 	call MPI_Reduce(resi_tur,temp_tur,2,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
 	!!*
-	temp     = sqrt(temp    /totalnodes)
-	temp_tur = sqrt(temp_tur/totalnodes)
+	
 	!!output to screen
 	if(myid .eq. root)then
+		temp     = sqrt(temp    /totalnodes)
+		temp_tur = sqrt(temp_tur/totalnodes)
 		print *, 'residual:'
 		write(*,5) temp(1),temp(2),temp(3),temp(5)
 5	format("D: ",E11.4," U: ",E11.4," V: ",E11.4," E: ",E11.4)
