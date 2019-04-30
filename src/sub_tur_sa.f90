@@ -198,6 +198,8 @@ subroutine sa_rhs1(sa_rhs,nut,pri_v,dxidx,  &
 			wzeta = -(0.5d0*(ww + abs(ww))*(nutc - nutm) &
 			    	+ 0.5d0*(ww - abs(ww))*(nutp - nutc))
 			!!*
+		else
+			wzeta = 0.d0
 		end if
 
 		sa_rhs(i,j,k) = uxi+veta+wzeta
@@ -679,7 +681,7 @@ subroutine sa_lusgs(nut,dt,sa_rhs,pri_v,dxidx,diasd,re,cfl,is,ie,js,je,ks,ke,is1
 			u  = pri_v(2,i,j,k)
 			v  = pri_v(3,i,j,k)
 			w  = pri_v(4,i,j,k)
-				
+
 			dxidx0 = dxidx(1,i,j,k)
 			dxidy0 = dxidx(2,i,j,k)
 			dxidz0 = dxidx(3,i,j,k)
