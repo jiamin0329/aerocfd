@@ -111,14 +111,17 @@ subroutine viscous_flux(rhsv,pri_v,amu,vor,dudx,tao,dxidx,inv_j,tinf,prl,prt,gam
 			txi(i,j,k) = t(i+1,j,k) - t(i,j,k)
 			uxi(i,j,k) = u(i+1,j,k) - u(i,j,k)
 			vxi(i,j,k) = v(i+1,j,k) - v(i,j,k)
+			wxi(i,j,k) = w(i+1,j,k) - w(i,j,k)
 		else if (i .eq. ie0) then
 			txi(i,j,k) = t(i,j,k) - t(i-1,j,k)
 			uxi(i,j,k) = u(i,j,k) - u(i-1,j,k)
 			vxi(i,j,k) = v(i,j,k) - v(i-1,j,k)
+			wxi(i,j,k) = w(i,j,k) - w(i-1,j,k)
 		else 
 			txi(i,j,k) = (t(i+1,j,k) - t(i-1,j,k))/2.d0
 			uxi(i,j,k) = (u(i+1,j,k) - u(i-1,j,k))/2.d0
 			vxi(i,j,k) = (v(i+1,j,k) - v(i-1,j,k))/2.d0
+			wxi(i,j,k) = (w(i+1,j,k) - w(i-1,j,k))/2.d0
 		end if
 	end do
  	end do   
@@ -132,19 +135,21 @@ subroutine viscous_flux(rhsv,pri_v,amu,vor,dudx,tao,dxidx,inv_j,tinf,prl,prt,gam
 			teta(i,j,k) = t(i,j+1,k) - t(i,j,k)
 			ueta(i,j,k) = u(i,j+1,k) - u(i,j,k)
 			veta(i,j,k) = v(i,j+1,k) - v(i,j,k)
+			weta(i,j,k) = w(i,j+1,k) - w(i,j,k)
 		else if(j .eq. je0) then
 			teta(i,j,k) = t(i,j,k) - t(i,j-1,k)
 			ueta(i,j,k) = u(i,j,k) - u(i,j-1,k)
 			veta(i,j,k) = v(i,j,k) - v(i,j-1,k)
+			weta(i,j,k) = w(i,j,k) - w(i,j-1,k)
 		else 
 			teta(i,j,k) = (t(i,j+1,k) - t(i,j-1,k))/2.d0
 			ueta(i,j,k) = (u(i,j+1,k) - u(i,j-1,k))/2.d0
 			veta(i,j,k) = (v(i,j+1,k) - v(i,j-1,k))/2.d0
+			weta(i,j,k) = (w(i,j+1,k) - w(i,j-1,k))/2.d0
 		end if    
  	end do
 	end do
 	end do
-
 
 	!! zeta direction
 	if (iflag_dimension .eq. iflag_3d) then
@@ -152,17 +157,20 @@ subroutine viscous_flux(rhsv,pri_v,amu,vor,dudx,tao,dxidx,inv_j,tinf,prl,prt,gam
 		do j = js0,je0
 		do i = is0,ie0
 			if     (k .eq. ks0) then
-				teta(i,j,k) = t(i,j,k+1) - t(i,j,k)
-				ueta(i,j,k) = u(i,j,k+1) - u(i,j,k)
-				veta(i,j,k) = v(i,j,k+1) - v(i,j,k)
+				tzeta(i,j,k) = t(i,j,k+1) - t(i,j,k)
+				uzeta(i,j,k) = u(i,j,k+1) - u(i,j,k)
+				vzeta(i,j,k) = v(i,j,k+1) - v(i,j,k)
+				wzeta(i,j,k) = w(i,j,k+1) - w(i,j,k)
 			else if(k .eq. ke0) then
-				teta(i,j,k) = t(i,j,k) - t(i,j,k-1)
-				ueta(i,j,k) = u(i,j,k) - u(i,j,k-1)
-				veta(i,j,k) = v(i,j,k) - v(i,j,k-1)
+				tzeta(i,j,k) = t(i,j,k) - t(i,j,k-1)
+				uzeta(i,j,k) = u(i,j,k) - u(i,j,k-1)
+				vzeta(i,j,k) = v(i,j,k) - v(i,j,k-1)
+				wzeta(i,j,k) = w(i,j,k) - w(i,j,k-1)
 			else 
-				teta(i,j,k) = (t(i,j,k+1) - t(i,j,k-1))/2.d0
-				ueta(i,j,k) = (u(i,j,k+1) - u(i,j,k-1))/2.d0
-				veta(i,j,k) = (v(i,j,k+1) - v(i,j,k-1))/2.d0
+				tzeta(i,j,k) = (t(i,j,k+1) - t(i,j,k-1))/2.d0
+				uzeta(i,j,k) = (u(i,j,k+1) - u(i,j,k-1))/2.d0
+				vzeta(i,j,k) = (v(i,j,k+1) - v(i,j,k-1))/2.d0
+				wzeta(i,j,k) = (w(i,j,k+1) - w(i,j,k-1))/2.d0
 			end if    
 		end do
 		end do
@@ -174,13 +182,6 @@ subroutine viscous_flux(rhsv,pri_v,amu,vor,dudx,tao,dxidx,inv_j,tinf,prl,prt,gam
 		write(*,*) "Writing ", debugFile
 		call DEBUG_OUTPUT_2D_1(debugFile,mm,ueta,is,ie,js,je,ks,ke,is0,ie0,js0,je0)
 	end if
-		
-	wxi   = 0.d0
-	weta  = 0.d0
-	tzeta = 0.d0
-	uzeta = 0.d0
-	vzeta = 0.d0
-	wzeta = 0.d0
 	!!*
 	
 	do k = ks0,ke0
@@ -259,7 +260,7 @@ subroutine viscous_flux(rhsv,pri_v,amu,vor,dudx,tao,dxidx,inv_j,tinf,prl,prt,gam
 	do i = is0,ie0
 		vor(i,j,k) = sqrt((dudx(6,i,j,k) - dudx(8,i,j,k))**2 &
 				         +(dudx(3,i,j,k) - dudx(7,i,j,k))**2 &
-				         +(dudx(2,i,j,k) - dudx(4,i,j,k))**2)
+						 +(dudx(2,i,j,k) - dudx(4,i,j,k))**2)
 	end do
 	end do
 	end do

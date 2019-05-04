@@ -556,6 +556,7 @@ subroutine sa_rhs3(sa_rhs,nut,pri_v,amu,vor,length,diasd,re,&
 	real*8  :: sp,sd
 	real*8  :: spn,sdn
 	real*8  :: leixn,fv1n,fv2n,ft2n,sn,gn,rn,fwn	
+	real*8  :: div
 	
 	do k = ks1,ke1
 	do j = js1,je1
@@ -572,7 +573,10 @@ subroutine sa_rhs3(sa_rhs,nut,pri_v,amu,vor,length,diasd,re,&
 		
 		s     = omega + nut0*fv2/(re*kar**2*dist0**2)
 		s     = max(s,0.3d0*omega)
-		r     = nut0/(s*re*kar**2*dist0**2)
+		
+		div = s*re*kar**2*dist0**2
+		div = max(div, 1.0d-6)
+		r     = nut0*div !!nut0/(s*re*kar**2*dist0**2)
 		r     = min(r,10.d0)
 		g     = r + cw2*(r**6 - r)
 		fw    = g*((1.d0 + cw3**6)/(g**6 + cw3**6))**(1.d0/6.d0)
@@ -604,7 +608,9 @@ subroutine sa_rhs3(sa_rhs,nut,pri_v,amu,vor,length,diasd,re,&
 		
 		!!get fwn
 		sn    = 1.d0/(re*kar**2*dist0**2)*(fv2 + fv2n*nut0)
-		rn    = (s-sn*nut0)/s**2/(re*kar**2*dist0**2)
+		div   = s**2*(re*kar**2*dist0**2)
+		div   = max(div,1.d-6)
+		rn    = (s-sn*nut0)/div !!(s-sn*nut0)/s**2/(re*kar**2*dist0**2)
 		gn    = (1.d0 + cw2*6.d0*r**5 - cw2)*rn
 		fwn   = -(1.d0/6.d0)*((g**(-6.d0)+cw3**(-6.d0))/(1.d0+cw3**(-6.d0)))**(-7.d0/6.d0)
 		fwn   = fwn/(1.d0+cw3**(-6.d0))*(-6.d0*g**(-7.d0))*gn
