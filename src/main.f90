@@ -138,7 +138,13 @@ program sjtucfd_mpi
 	call init_readbcinfo
 	call init_allocatememory
 	call init_readbcinfo2
-	call UpdateBufferCoordinate
+
+	if (iflag_dimension .eq. iflag_3d) then
+		call UpdateBufferCoordinate
+	else 
+		call updatebuffercoordinate2d
+	end if
+
 	call init_flowfield
 
 	if(myid .eq. root)then
@@ -201,7 +207,7 @@ program sjtucfd_mpi
 		                        blk(m0)%x,blk(m0)%y,blk(m0)%z,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0,m0)
 	end do
 
-	if (isDebug .eq. 1) then
+	!!if (isDebug .eq. 1) then
 	do m0 = 1,blk_loop
 		is = blk(m0)%is;ie = blk(m0)%ie
 		js = blk(m0)%js;je = blk(m0)%je
@@ -229,7 +235,7 @@ program sjtucfd_mpi
 		call DEBUG_OUTPUT_3D_3(debugFile,m0,blk(m0)%ggamma,is,ie,js,je,ks,ke,is0,ie0,js0,je0,ks0,ke0)
 	end do
 	!!pause
-	end if
+	!!end if
 	
 	if(myid .eq. root)then
 		write(*,*) '***********************************************************'
@@ -301,9 +307,16 @@ program sjtucfd_mpi
 	!!***************************************************!!
 	!! update main equation in buffer block
 	call physical_bc
-	call UpdateBuffer
-	call average1
-	call average2
+	if (iflag_dimension .eq. iflag_3d) then
+		call UpdateBuffer
+		call average1
+		call average2
+	else
+		call UpdateBuffer2d
+		call average2d1
+		call average2d2
+	end if
+
 	call MPI_BARRIER(MPI_COMM_WORLD,ierr)  
 
 	if (isDebug .eq. 1) then
@@ -408,9 +421,15 @@ program sjtucfd_mpi
 
 			!!update boundary condition
 			call physical_bc
-			call UpdateBuffer
-			call average1
-			call average2
+			if (iflag_dimension .eq. iflag_3d) then
+				call UpdateBuffer
+				call average1
+				call average2
+			else
+				call UpdateBuffer2d
+				call average2d1
+				call average2d2
+			end if
 
 			do m0 = 1,blk_loop
 				is  = blk(m0)%is; ie  = blk(m0)%ie
@@ -431,9 +450,15 @@ program sjtucfd_mpi
 		if (iflag_timeadvance .eq. iflag_2ndcrank) then 
 			do sub = 1,3
 			call physical_bc
-			call updatebuffer
-			call average1
-			call average2
+			if (iflag_dimension .eq. iflag_3d) then
+				call UpdateBuffer
+				call average1
+				call average2
+			else
+				call UpdateBuffer2d
+				call average2d1
+				call average2d2
+			end if
 
 			do m0 = 1,blk_loop
 				is  = blk(m0)%is; ie  = blk(m0)%ie
@@ -520,9 +545,15 @@ program sjtucfd_mpi
 			
 			!!update boundary condition
 			call physical_bc
-			call updatebuffer
-			call average1
-			call average2	
+			if (iflag_dimension .eq. iflag_3d) then
+				call UpdateBuffer
+				call average1
+				call average2
+			else
+				call UpdateBuffer2d
+				call average2d1
+				call average2d2
+			end if
 
 			do m0 = 1,blk_loop
 				is  = blk(m0)%is; ie  = blk(m0)%ie
